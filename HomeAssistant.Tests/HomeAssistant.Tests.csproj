@@ -6,17 +6,13 @@
 
         <IsPackable>false</IsPackable>
 
-        <AssemblyName>goHomeAssistant.Tests</AssemblyName>
+        <PackageId>HomeAssistant.Tests</PackageId>
 
-        <RootNamespace>goHomeAssistant.Tests</RootNamespace>
+        <Authors>HomeAssistant.Tests</Authors>
 
-        <PackageId>goHomeAssistant.Tests</PackageId>
+        <Company>HomeAssistant.Tests</Company>
 
-        <Authors>goHomeAssistant.Tests</Authors>
-
-        <Company>goHomeAssistant.Tests</Company>
-
-        <Product>goHomeAssistant.Tests</Product>
+        <Product>HomeAssistant.Tests</Product>
     </PropertyGroup>
 
     <ItemGroup>
@@ -33,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\goHomeAssistant.Service\goHomeAssistant.Service.csproj" />
+      <ProjectReference Include="..\HomeAssistant.Service\HomeAssistant.Service.csproj" />
     </ItemGroup>
 
 </Project>

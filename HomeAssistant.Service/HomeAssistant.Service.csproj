@@ -4,14 +4,12 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>dotnet-goHomeAssistant.Service-8008E5E2-5757-4058-BB7A-7D419396C7C3</UserSecretsId>
+        <UserSecretsId>dotnet-HomeAssistant.Service-8008E5E2-5757-4058-BB7A-7D419396C7C3</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <AssemblyName>goHomeAssistant.Service</AssemblyName>
-        <RootNamespace>goHomeAssistant.Service</RootNamespace>
-        <PackageId>goHomeAssistant.Service</PackageId>
-        <Authors>goHomeAssistant.Service</Authors>
-        <Company>goHomeAssistant.Service</Company>
-        <Product>goHomeAssistant.Service</Product>
+        <PackageId>HomeAssistant.Service</PackageId>
+        <Authors>HomeAssistant.Service</Authors>
+        <Company>HomeAssistant.Service</Company>
+        <Product>HomeAssistant.Service</Product>
     </PropertyGroup>
 
     <ItemGroup>

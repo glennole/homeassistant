@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "goHomeAssistant.Tests", "goHomeAssistant.Tests\goHomeAssistant.Tests.csproj", "{5B5BB41A-E216-47FB-BBAC-4D9D4223B874}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.Tests", "HomeAssistant.Tests\HomeAssistant.Tests.csproj", "{5B5BB41A-E216-47FB-BBAC-4D9D4223B874}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "goHomeAssistant.Service", "goHomeAssistant.Service\goHomeAssistant.Service.csproj", "{684F0A1E-6E88-4D85-AF6B-F5315DDAF319}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.Service", "HomeAssistant.Service\HomeAssistant.Service.csproj", "{684F0A1E-6E88-4D85-AF6B-F5315DDAF319}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

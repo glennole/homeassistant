@@ -1,4 +1,4 @@
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class Sensor<T>
 {

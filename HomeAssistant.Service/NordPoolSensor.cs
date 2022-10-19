@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class NordPoolAttributes : Attributes
 {

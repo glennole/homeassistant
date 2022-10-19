@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using goHomeAssistant.Service;
+using HomeAssistant.Service;
 
-namespace goHomeAssistant.Tests;
+namespace HomeAssistant.Tests;
 
 public class HomeAssistantProxyMocked : IHomeAssistantProxy
 {

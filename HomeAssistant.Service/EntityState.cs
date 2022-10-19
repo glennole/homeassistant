@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class EntityState<T>
 {

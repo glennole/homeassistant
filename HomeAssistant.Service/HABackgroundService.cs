@@ -1,7 +1,7 @@
 using Quartz;
 using Quartz.Impl;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class VVSBackgroundService : BackgroundService
 {

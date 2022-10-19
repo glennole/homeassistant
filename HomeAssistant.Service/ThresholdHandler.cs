@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class ThresholdHandler
 {

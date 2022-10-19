@@ -1,4 +1,4 @@
-using goHomeAssistant.Service;
+using HomeAssistant.Service;
 using Microsoft.Extensions.Options;
 using Quartz;
 

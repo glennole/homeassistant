@@ -1,6 +1,6 @@
 using Quartz;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class WaterHeaterJob : IJob
 {

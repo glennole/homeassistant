@@ -1,7 +1,7 @@
-using goHomeAssistant.Service;
+using HomeAssistant.Service;
 using Xunit;
 
-namespace goHomeAssistant.Tests;
+namespace HomeAssistant.Tests;
 
 public class SwitchTest
 {

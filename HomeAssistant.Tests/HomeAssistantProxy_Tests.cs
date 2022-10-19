@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using goHomeAssistant.Service;
+using HomeAssistant.Service;
 using Xunit;
 
-namespace goHomeAssistant.Tests;
+namespace HomeAssistant.Tests;
 
 public class HomeAssistantProxy_Tests
 {

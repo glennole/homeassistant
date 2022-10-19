@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class Switch
 {

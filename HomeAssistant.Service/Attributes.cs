@@ -1,7 +1,7 @@
 using System.Security.Principal;
 using System.Text.Json.Serialization;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public class Attributes
 {

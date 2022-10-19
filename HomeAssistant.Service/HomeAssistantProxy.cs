@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 
-namespace goHomeAssistant.Service;
+namespace HomeAssistant.Service;
 
 public interface IHomeAssistantProxy
 {
