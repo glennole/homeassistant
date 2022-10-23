@@ -1,4 +1,5 @@
 using HomeAssistant.Service;
+using HomeAssistant.Service.Vault;
 using Microsoft.Extensions.Options;
 using Quartz;
 
@@ -7,14 +8,29 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         configuration.Sources.Clear();
         IHostEnvironment env = hostingContext.HostingEnvironment;
-
         configuration
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{env.EnvironmentName}.json");
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+        configuration.AddEnvironmentVariables(prefix: "VAULT_");
+        var buildConfig = configuration.Build();
+       
+        configuration.AddVault(options =>
+        {
+            var vaultOptions = buildConfig.GetSection("Vault");
+            options.Address = vaultOptions["Address"];
+            options.MountPath = vaultOptions["MountPath"];
+            options.Token = buildConfig.GetSection("TOKEN").Value;
+        });
+        
     })
     .ConfigureServices((context, services) =>
     {
         var configurationRoot = context.Configuration;
+        services.Configure<VaultOptions>(configurationRoot.GetSection("Vault"));
+        if (configurationRoot["HomeAssistantOptions:Token"] != null)
+        {
+            Console.WriteLine(configurationRoot["HomeAssistantOptions:Token"]);
+        }
+        
         services.Configure<HomeAssistantOptions>(
             configurationRoot.GetSection(nameof(HomeAssistantOptions)));
         

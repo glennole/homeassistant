@@ -6,3 +6,4 @@ riderModule.iml
 .idea
 HomeAssistant.sln.DotSettings.user
 appsettings.Development.json
+launchSettings.json

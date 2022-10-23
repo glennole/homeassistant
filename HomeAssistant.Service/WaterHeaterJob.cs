@@ -16,7 +16,7 @@ public class WaterHeaterJob : IJob
     public async Task Execute(IJobExecutionContext context)
     {
 
-        _switch.TurnOn();
+        //_switch.TurnOn();
         Console.WriteLine("Water heater job " + _switch.MinimumOperatingHoursPerDay);
     }
 }
