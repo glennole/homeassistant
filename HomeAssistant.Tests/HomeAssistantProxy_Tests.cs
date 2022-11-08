@@ -34,14 +34,14 @@ public class HomeAssistantProxy_Tests
     [Fact]
     public void TurnOnHeavyDutySwitch_SwitchIsRegisteredAsOn()
     {
-        Switch heavyDutySwitch = new Switch("switch.heavy_duty_switch", _homeAssistantProxy, 6);
+        Switch heavyDutySwitch = new Switch("switch.heavy_duty_switch", _homeAssistantProxy);
         Assert.True(heavyDutySwitch.TurnOn() == State.On);
     }
     
     [Fact]
     public void TurnOffHeavyDutySwitch_SwitchIsRegisteredAsOff()
     {
-        Switch heavyDutySwitch = new Switch("switch.heavy_duty_switch", _homeAssistantProxy, 6);
+        Switch heavyDutySwitch = new Switch("switch.heavy_duty_switch", _homeAssistantProxy);
         Assert.True(heavyDutySwitch.TurnOff() == State.Off);
     }
 }

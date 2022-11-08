@@ -11,7 +11,7 @@ public class SwitchTest
     public SwitchTest()
     {
         IHomeAssistantProxy homeAssistantProxy = new HomeAssistantProxyMocked();
-        _switch = new Switch("switch.heavy_duty_switch", homeAssistantProxy, 6);
+        _switch = new Switch("switch.heavy_duty_switch", homeAssistantProxy);
     }
 
     [Fact]
@@ -30,45 +30,46 @@ public class SwitchTest
     public void StateHasChangedAfterSwitchIsTurnedOnWhenInitiallyTurnedOff()
     {
         _switch.TurnOff();
-        var changedStateAtBefore = _switch.StateChangedAt;
+        var changedStateAtBefore = _switch.LastChangedAt;
 
         _switch.TurnOn();
         Assert.Equal(State.On, _switch.State);
-        Assert.True(_switch.StateChangedAt > changedStateAtBefore);
+        Assert.True(_switch.LastChangedAt > changedStateAtBefore);
     }
     
     [Fact]
     public void StateHasNotChangedAfterSwitchIsTurnedOnWhenInitiallyTurnedOn()
     {
         _switch.TurnOn();
-        var stateChangedAtBefore = _switch.StateChangedAt;
+        var stateChangedAtBefore = _switch.LastChangedAt;
 
         
         _switch.TurnOn();
         Assert.Equal(State.On, _switch.State);
-        Assert.Equal(stateChangedAtBefore, _switch.StateChangedAt);
+        Assert.True(stateChangedAtBefore < _switch.LastChangedAt);
     }
     
     [Fact]
     public void StateHasChangedAfterSwitchIsTurnedOffWhenInitiallyTurnedOn()
     {
         _switch.TurnOn();
-        var stateChangedAtBefore = _switch.StateChangedAt;
+        var stateChangedAtBefore = _switch.LastChangedAt;
 
         _switch.TurnOff();
         Assert.Equal(State.Off, _switch.State);
-        Assert.True(_switch.StateChangedAt > stateChangedAtBefore);
+        Assert.True(_switch.LastChangedAt > stateChangedAtBefore);
     }
     
     [Fact]
     public void StateHasNotChangedAfterSwitchIsTurnedOffWhenInitiallyTurnedOff()
     {
         _switch.TurnOff();
-        var stateChangedAtBefore = _switch.StateChangedAt;
+        var stateChangedAtBefore = _switch.LastChangedAt;
 
         _switch.TurnOff();
         Assert.Equal(State.Off, _switch.State);
-        Assert.Equal(stateChangedAtBefore, _switch.StateChangedAt);
+        Assert.True(stateChangedAtBefore < _switch.LastChangedAt);
+        
     }
 
     

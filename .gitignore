@@ -5,5 +5,3 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea
 HomeAssistant.sln.DotSettings.user
-appsettings.Development.json
-launchSettings.json

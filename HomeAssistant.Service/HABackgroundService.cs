@@ -1,24 +1,21 @@
 using Quartz;
 using Quartz.Impl;
+using Serilog;
 
 namespace HomeAssistant.Service;
 
 public class VVSBackgroundService : BackgroundService
 {
-    private readonly ILogger<VVSBackgroundService> _logger;
     private readonly List<Switch> _switches;
     private readonly IHomeAssistantProxy _homeAssistantProxy;
 
     public List<Switch> Switches => _switches;
     public Sensor<NordPoolAttributes> NordpoolSensor { get; }
 
-    public ThresholdHandler ThresholdHandler { get; }
+    public WaterHeater WaterHeater { get; }
 
-    public VVSBackgroundService(ILogger<VVSBackgroundService> logger, IHomeAssistantProxy homeAssistantProxy)
+    public VVSBackgroundService(IHomeAssistantProxy homeAssistantProxy)
     {
-        _logger = logger;
-        
-        
         _switches = new List<Switch>();
         
         // _switches.Add(new Switch("switch.heavy_duty_switch", homeAssistantProxy, 5));
@@ -31,7 +28,7 @@ public class VVSBackgroundService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            Log.Debug("Worker running at: {time}", DateTimeOffset.Now);
 
             // foreach (var @switch in _switches)
             // {

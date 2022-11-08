@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace HomeAssistant.Service;
 
@@ -29,26 +30,30 @@ public class HomeAssistantProxy : IHomeAssistantProxy
     
     public async Task<IEnumerable<EntityState<T>>> GetEntityStates<T>()
     {
+        Log.Debug("Requesting all entities states");
         HttpResponseMessage response = await _client.GetAsync("states");
         response.EnsureSuccessStatusCode();
-
         string responseJson = await response.Content.ReadAsStringAsync();
+        Log.Debug("Response from get all entities states request: {@entityStateResponses}", responseJson);
 
         return JsonSerializer.Deserialize<IEnumerable<EntityState<T>>>(responseJson);
     }
 
     public async Task<EntityState<T>> GetEntityStateByEntityId<T>(string entityId)
     {
+        Log.Debug("Requesting entity states from {@entityId}", entityId);
         HttpResponseMessage response = await _client.GetAsync($"states/{entityId}");
         response.EnsureSuccessStatusCode();
 
         string responseJson = await response.Content.ReadAsStringAsync();
-
+        Log.Debug("Response from get entity states request for {@entityId}: {entityStateResponse}", entityId, responseJson);
+        
         return JsonSerializer.Deserialize<EntityState<T>>(responseJson);
     }
 
     public async Task<IEnumerable<EntityState<T>>> TurnOnSwitch<T>(string entityId)
     {
+        Log.Debug("Requesting switch to turn on for {@entityId}", entityId);
         var data = new
         {
             entity_id = entityId
@@ -58,12 +63,14 @@ public class HomeAssistantProxy : IHomeAssistantProxy
         response.EnsureSuccessStatusCode();
 
         string responseJson = await response.Content.ReadAsStringAsync();
-
+        Log.Debug("Response from turn on switch request for {@entityId}: {@entityStateResponse}", entityId, responseJson);
+        
         return JsonSerializer.Deserialize<IEnumerable<EntityState<T>>>(responseJson);
     }
     
     public async Task<IEnumerable<EntityState<T>>> TurnOffSwitch<T>(string entityId)
     {
+        Log.Debug("Requesting switch to turn off for {@entityId}", entityId);
         var data = new
         {
             entity_id = entityId
@@ -73,6 +80,7 @@ public class HomeAssistantProxy : IHomeAssistantProxy
         response.EnsureSuccessStatusCode();
 
         string responseJson = await response.Content.ReadAsStringAsync();
+        Log.Debug("Response from turn off switch for {@entityId}: {@entityStateResponse}", entityId, responseJson);
 
         return JsonSerializer.Deserialize<IEnumerable<EntityState<T>>>(responseJson);
     }

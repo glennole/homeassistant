@@ -32,11 +32,10 @@ public class VaultConfigurationProvider : ConfigurationProvider
 
     public async Task GetHomeAssistantCredentials()
     {
-        var homeAssistantToken = (await _client.V1.Secrets.KeyValue.V1.ReadSecretAsync("homeassistant/token", _config.MountPath)).Data["token"].ToString();
-        var homeAssistantBaseUri= (await _client.V1.Secrets.KeyValue.V1.ReadSecretAsync("homeassistant/baseuri", _config.MountPath)).Data["baseuri"].ToString();
+        var homeAssistantSecret= (await _client.V1.Secrets.KeyValue.V1.ReadSecretAsync("homeassistant", _config.MountPath));
         
-        Data.Add("HomeAssistantOptions:Token", homeAssistantToken);
-        Data.Add("HomeAssistantOptions:BaseUri", homeAssistantBaseUri);
+        Data.Add("HomeAssistantOptions:Token", homeAssistantSecret.Data["Token"].ToString());
+        Data.Add("HomeAssistantOptions:BaseUri", homeAssistantSecret.Data["BaseURI"].ToString());
     }
 }
 

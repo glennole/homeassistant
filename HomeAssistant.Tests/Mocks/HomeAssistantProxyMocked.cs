@@ -53,13 +53,15 @@ public class HomeAssistantProxyMocked : IHomeAssistantProxy
             Attributes = new NordPoolAttributes()
             {
                 CurrentPrice = 5.89,
-                Today = new List<double>()
+                Today = new[]
                 {
                     1.00,2.00,1.12,1.15,1.26,1.56,5.56,5.89,1.00,2.00,1.12,1.15,1.26,1.56,5.56,5.89,1.00,2.00,1.12,1.15,1.26,1.56,5.56,5.89
                 },
                 Max = 5.89
             }
         };
+
+        sensor.Attributes.Average = sensor.Attributes.Today.Sum() / 24.0;
 
         var heavySwitch = new EntityState<Attributes>()
         {
