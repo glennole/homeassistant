@@ -1,3 +1,6 @@
+using HomeAssistant.Database;
+using HomeAssistant.Service.Configuration;
+using Microsoft.Extensions.Options;
 using Quartz;
 using Quartz.Impl;
 using Serilog;
@@ -14,10 +17,11 @@ public class VVSBackgroundService : BackgroundService
 
     public WaterHeater WaterHeater { get; }
 
-    public VVSBackgroundService(IHomeAssistantProxy homeAssistantProxy)
+    public VVSBackgroundService(IHomeAssistantProxy homeAssistantProxy, IOptions<PostgresqlOptions> postgresqlConfig)
     {
         _switches = new List<Switch>();
         
+        DatabaseWorker.Migrate(postgresqlConfig.Value.ConnectionString);
         // _switches.Add(new Switch("switch.heavy_duty_switch", homeAssistantProxy, 5));
         // NordpoolSensor = new Sensor<NordPoolAttributes>("sensor.nordpool_kwh_krsand_nok_3_095_025", homeAssistantProxy);
         // ThresholdHandler = new ThresholdHandler(NordpoolSensor);

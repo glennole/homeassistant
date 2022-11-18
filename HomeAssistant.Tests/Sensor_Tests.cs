@@ -24,13 +24,13 @@ public class Sensor_Tests
     [Fact]
     public void GetNordPoolReadings_ReturnsCurrentPrice()
     {
-        Assert.True(_sensor.GetReadings().CurrentPrice > 0.0);
+        Assert.True(_sensor.GetReadings().Attributes.CurrentPrice > 0.0);
     }
 
     [Fact]
     public void GetNordPoolReadings_TodayPrices()
     {
-        Assert.True(_sensor.GetReadings().Today.Count() == 24);
+        Assert.True(_sensor.GetReadings().Attributes.Today.Count() == 24);
     }
     
     [Fact]

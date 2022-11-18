@@ -4,6 +4,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.Tests", "Home
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.Service", "HomeAssistant.Service\HomeAssistant.Service.csproj", "{684F0A1E-6E88-4D85-AF6B-F5315DDAF319}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.Database", "HomeAssistant.Database\HomeAssistant.Database.csproj", "{FB1EFDAF-F580-4CD7-9477-32E5CFA68E7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.Contracts", "HomeAssistant.Contracts\HomeAssistant.Contracts.csproj", "{F882B445-719E-4ACF-A5DA-3D569FE8F839}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAssistant.PostgreSql", "HomeAssistant.PostgreSql\HomeAssistant.PostgreSql.csproj", "{92FB7A80-4F8A-4377-83B1-F18310E207BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +24,17 @@ Global
 		{684F0A1E-6E88-4D85-AF6B-F5315DDAF319}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{684F0A1E-6E88-4D85-AF6B-F5315DDAF319}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{684F0A1E-6E88-4D85-AF6B-F5315DDAF319}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB1EFDAF-F580-4CD7-9477-32E5CFA68E7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB1EFDAF-F580-4CD7-9477-32E5CFA68E7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB1EFDAF-F580-4CD7-9477-32E5CFA68E7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB1EFDAF-F580-4CD7-9477-32E5CFA68E7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F882B445-719E-4ACF-A5DA-3D569FE8F839}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F882B445-719E-4ACF-A5DA-3D569FE8F839}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F882B445-719E-4ACF-A5DA-3D569FE8F839}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F882B445-719E-4ACF-A5DA-3D569FE8F839}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92FB7A80-4F8A-4377-83B1-F18310E207BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92FB7A80-4F8A-4377-83B1-F18310E207BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92FB7A80-4F8A-4377-83B1-F18310E207BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92FB7A80-4F8A-4377-83B1-F18310E207BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

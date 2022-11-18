@@ -4,21 +4,20 @@ public class Sensor<T>
 {
     private readonly string _entityId;
     private readonly IHomeAssistantProxy _homeAssistantProxy;
-    
+
     public T Attributes { get; private set; }
     
     public Sensor(string entityId, IHomeAssistantProxy homeAssistantProxy)
     {
         _entityId = entityId;
         _homeAssistantProxy = homeAssistantProxy;
-
-        Attributes = GetReadings();
+        GetReadings();
     }
 
-    public T GetReadings()
+    public EntityState<T> GetReadings()
     {
-        var result = _homeAssistantProxy.GetEntityStateByEntityId<T>(_entityId).Result.Attributes;
-
+        var result = _homeAssistantProxy.GetEntityStateByEntityId<T>(_entityId).Result;
+        Attributes = result.Attributes;
         return result;
     }
 }

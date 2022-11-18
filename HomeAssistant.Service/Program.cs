@@ -1,4 +1,9 @@
+using System.Collections.Specialized;
+using HomeAssistant.Contracts.Repositories;
+using HomeAssistant.Database;
+using HomeAssistant.PostgreSql.Repositories;
 using HomeAssistant.Service;
+using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.Vault;
 using Quartz;
 using Serilog;
@@ -12,7 +17,6 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         logging.ClearProviders();
         ILogger logger = new LoggerConfiguration()
-//            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Information)
             .Enrich.FromLogContext()
             .CreateLogger();
     })
@@ -46,33 +50,40 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         var configurationRoot = context.Configuration;
         services.Configure<VaultOptions>(configurationRoot.GetSection("Vault"));
-        if (configurationRoot["HomeAssistantOptions:Token"] != null)
-        {
-            Console.WriteLine(configurationRoot["HomeAssistantOptions:Token"]);
-        }
 
+        var waterHeaterCronExp = configurationRoot.GetSection("Jobs:WaterHeater:CronExp") ;
+        
         services.Configure<HomeAssistantOptions>(
             configurationRoot.GetSection(nameof(HomeAssistantOptions)));
 
+        services.Configure<PostgresqlOptions>(
+            configurationRoot.GetSection(nameof(PostgresqlOptions)));
+        
         services.AddSingleton<IHomeAssistantProxy, HomeAssistantProxy>();
+        services.AddSingleton<IDailyHourPriceRepository, DailyHourPriceRepository>();
+        services.AddSingleton<IHeavyDutySwitchRepository, HeavyDutySwitchRepository>();
 
         services.AddQuartz(q =>
         {
             q.UseMicrosoftDependencyInjectionJobFactory();
             q.ScheduleJob<WaterHeaterJob>(trigger => trigger
                 .WithIdentity("ControlWaterHeaterTrigger")
-                .WithSimpleSchedule(s => s.WithIntervalInSeconds(15)
-                    .RepeatForever())
+                .WithCronSchedule(waterHeaterCronExp.Value)
                 .WithDescription("This trigger will run every 15 seconds to turn on or off water heater.")
+            );
+            q.ScheduleJob<NordpoolSensorJob>(trigger => trigger
+                .WithIdentity("GetTodayAndTomorrowsPrices")
+                .WithCronSchedule(waterHeaterCronExp.Value)
+                .WithDescription(
+                    "This trigger will fetch data from the Nordpool sensor and add the hour prices for today and tomorrow to the database.")
             );
         });
         services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
         services.AddTransient<WaterHeaterJob>();
+        services.AddTransient<NordpoolSensorJob>();
         services.AddHostedService<VVSBackgroundService>();
     })
     .Build();
 
 IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
-
-Console.WriteLine(config["HomeAssistant:Token"]);
 await host.RunAsync();
