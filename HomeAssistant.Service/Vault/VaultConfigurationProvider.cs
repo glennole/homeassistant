@@ -36,6 +36,7 @@ public class VaultConfigurationProvider : ConfigurationProvider
         
         Data.Add("HomeAssistantOptions:Token", homeAssistantSecret.Data["Token"].ToString());
         Data.Add("HomeAssistantOptions:BaseUri", homeAssistantSecret.Data["BaseURI"].ToString());
+        Data.Add("PostgresqlOptions:ConnectionString", homeAssistantSecret.Data["PostgresqlConnectionstring"].ToString());
     }
 }
 

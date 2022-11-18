@@ -36,7 +36,10 @@ public class Switch
         State = MapEntityStateToStateEnum(entityState.State);
         LastChangedAt = entityState.LastChangedAt;
         Log.Debug("Switch({@entityId}) is turned {@state}.", _entityId, State);
-       
+
+        Log.Debug("Persist state");
+        
+        
         return State;
     }
 

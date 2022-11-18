@@ -24,4 +24,10 @@
         <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.0.1" />
         <PackageReference Include="VaultSharp" Version="1.7.1" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\HomeAssistant.Contracts\HomeAssistant.Contracts.csproj" />
+      <ProjectReference Include="..\HomeAssistant.Database\HomeAssistant.Database.csproj" />
+      <ProjectReference Include="..\HomeAssistant.PostgreSql\HomeAssistant.PostgreSql.csproj" />
+    </ItemGroup>
 </Project>
