@@ -37,6 +37,8 @@ public class VaultConfigurationProvider : ConfigurationProvider
         Data.Add("HomeAssistantOptions:Token", homeAssistantSecret.Data["Token"].ToString());
         Data.Add("HomeAssistantOptions:BaseUri", homeAssistantSecret.Data["BaseURI"].ToString());
         Data.Add("PostgresqlOptions:ConnectionString", homeAssistantSecret.Data["PostgresqlConnectionstring"].ToString());
+        Data.Add("Jobs:WaterHeater:CronExp", homeAssistantSecret.Data["Jobs:WaterHeater:CronExp"].ToString());
+        Data.Add("Jobs:Nordpool:CronExp", homeAssistantSecret.Data["Jobs:Nordpool:CronExp"].ToString());
     }
 }
 

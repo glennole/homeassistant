@@ -51,7 +51,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         var configurationRoot = context.Configuration;
         services.Configure<VaultOptions>(configurationRoot.GetSection("Vault"));
 
-        var waterHeaterCronExp = configurationRoot.GetSection("Jobs:WaterHeater:CronExp") ;
+        var waterHeaterCronExp = configurationRoot.GetSection("Jobs:WaterHeater:CronExp");
+        var nordpoolCronExp = configurationRoot.GetSection("Jobs:Nordpool:CronExp");
         
         services.Configure<HomeAssistantOptions>(
             configurationRoot.GetSection(nameof(HomeAssistantOptions)));
@@ -73,7 +74,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             );
             q.ScheduleJob<NordpoolSensorJob>(trigger => trigger
                 .WithIdentity("GetTodayAndTomorrowsPrices")
-                .WithCronSchedule(waterHeaterCronExp.Value)
+                .WithCronSchedule(nordpoolCronExp.Value)
                 .WithDescription(
                     "This trigger will fetch data from the Nordpool sensor and add the hour prices for today and tomorrow to the database.")
             );
