@@ -69,12 +69,12 @@ IHost host = Host.CreateDefaultBuilder(args)
             q.UseMicrosoftDependencyInjectionJobFactory();
             q.ScheduleJob<WaterHeaterJob>(trigger => trigger
                 .WithIdentity("ControlWaterHeaterTrigger")
-                .WithCronSchedule(waterHeaterCronExp.Value)
+                .WithCronSchedule(waterHeaterCronExp.Value, x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
                 .WithDescription("This trigger will run every 15 seconds to turn on or off water heater.")
             );
             q.ScheduleJob<NordpoolSensorJob>(trigger => trigger
                 .WithIdentity("GetTodayAndTomorrowsPrices")
-                .WithCronSchedule(nordpoolCronExp.Value)
+                .WithCronSchedule(nordpoolCronExp.Value, x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
                 .WithDescription(
                     "This trigger will fetch data from the Nordpool sensor and add the hour prices for today and tomorrow to the database.")
             );
