@@ -27,7 +27,10 @@ public class WaterHeaterJob : IJob
     public async Task Execute(IJobExecutionContext context)
     {
         Log.Debug("Turn on water heater when price is below average");
-        var result = _waterHeater.OnWhenBelowAverage(DateTime.Now.Hour, _sensor);
+
+        DateTime osloTz = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Oslo");
+        var result = _waterHeater.OnWhenBelowAverage(osloTz.Hour, _sensor);
+        
         Log.Debug($"Water heater turned {result.ToString()} at {DateTime.Now}.");
         
         Log.Debug("Persisting current state of water heater");
