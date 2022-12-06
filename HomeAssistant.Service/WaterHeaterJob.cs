@@ -26,16 +26,25 @@ public class WaterHeaterJob : IJob
     
     public async Task Execute(IJobExecutionContext context)
     {
-        Log.Debug("Turn on water heater when price is below average");
+        try
+        {
+            Log.Debug("Turn on water heater when price is below average");
 
-        DateTime osloTz = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Oslo");
-        var result = _waterHeater.OnWhenBelowAverage(osloTz.Hour, _sensor);
+            DateTime osloTz = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Oslo");
+            var result = _waterHeater.OnWhenBelowAverage(osloTz.Hour, _sensor);
         
-        Log.Debug($"Water heater turned {result.ToString()} at {DateTime.Now}.");
+            Log.Debug($"Water heater turned {result.ToString()} at {DateTime.Now}.");
         
-        Log.Debug("Persisting current state of water heater");
-        _heavyDutySwitchRepository.AddAsync(_waterHeater.HeavyDutySwitch.MapToDto());
-        Log.Debug("Persist current state of water heater finished successfully");
+            Log.Debug("Persisting current state of water heater");
+            await _heavyDutySwitchRepository.AddAsync(_waterHeater.HeavyDutySwitch.MapToDto());
+            Log.Debug("Persist current state of water heater finished successfully");
+        }
+        catch (Exception e)
+        {
+            //Required to not let an error stop future executions of the job.
+            Log.Error(e, "Water heater job failed!");
+        }
+        
     }
 
 }
