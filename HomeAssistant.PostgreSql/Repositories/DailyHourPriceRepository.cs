@@ -23,14 +23,14 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
     public async Task<IDailyHourPrice> GetByIdAsync(int id)
     {
         string sql = "SELECT * FROM daily_hour_price WHERE id = @Id";
-        using var con = new NpgsqlConnection(ConnectionString);
+        await using var con = new NpgsqlConnection(ConnectionString);
         return await con.QueryFirstAsync<DailyHourPrice>(sql, new { Id = id});
 
     }
 
     public async Task<IDailyHourPrice> AddAsync(IDailyHourPrice item)
     {
-        string sql = "INSERT INTO daily_hour_price(date, hour, price, description) VALUES(@Date, @Hour, @Price, @Description)";
+        string sql = "INSERT INTO daily_hour_price(date, hour, price, description) VALUES(@Date, @Hour, @Price, @Description) RETURNING id";
         await using var con = new NpgsqlConnection(ConnectionString);
         var dailyHourPriceId = await con.QueryFirstAsync<int>(sql, item);
         return await GetByIdAsync(dailyHourPriceId);
