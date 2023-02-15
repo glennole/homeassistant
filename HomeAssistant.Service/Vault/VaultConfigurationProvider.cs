@@ -32,13 +32,14 @@ public class VaultConfigurationProvider : ConfigurationProvider
 
     public async Task GetHomeAssistantCredentials()
     {
-        var homeAssistantSecret= (await _client.V1.Secrets.KeyValue.V1.ReadSecretAsync("homeassistant", _config.MountPath));
+        var homeAssistantSecret= (await _client.V1.Secrets.KeyValue.V1.ReadSecretAsync(_config.Secret, _config.MountPath));
         
         Data.Add("HomeAssistantOptions:Token", homeAssistantSecret.Data["Token"].ToString());
         Data.Add("HomeAssistantOptions:BaseUri", homeAssistantSecret.Data["BaseURI"].ToString());
         Data.Add("PostgresqlOptions:ConnectionString", homeAssistantSecret.Data["PostgresqlConnectionstring"].ToString());
         Data.Add("Jobs:WaterHeater:CronExp", homeAssistantSecret.Data["Jobs:WaterHeater:CronExp"].ToString());
         Data.Add("Jobs:Nordpool:CronExp", homeAssistantSecret.Data["Jobs:Nordpool:CronExp"].ToString());
+        Data.Add("SendGrid:ApiKey", homeAssistantSecret.Data["SendGrid:ApiKey"].ToString());
     }
 }
 

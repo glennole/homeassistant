@@ -4,11 +4,10 @@ using HomeAssistant.Database;
 using HomeAssistant.PostgreSql.Repositories;
 using HomeAssistant.Service;
 using HomeAssistant.Service.Configuration;
+using HomeAssistant.Service.SendGrid;
 using HomeAssistant.Service.Vault;
 using Quartz;
 using Serilog;
-using Serilog.Formatting.Compact;
-using Serilog.Sinks.Grafana.Loki;
 using ILogger = Serilog.ILogger;
 
 
@@ -43,6 +42,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             var vaultOptions = buildConfig.GetSection("Vault");
             options.Address = vaultOptions["Address"];
             options.MountPath = vaultOptions["MountPath"];
+            options.Secret = vaultOptions["Secret"];
             options.Token = buildConfig.GetSection("TOKEN").Value;
         });
     })
@@ -53,6 +53,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         var waterHeaterCronExp = configurationRoot.GetSection("Jobs:WaterHeater:CronExp");
         var nordpoolCronExp = configurationRoot.GetSection("Jobs:Nordpool:CronExp");
+        var sendGridApiKey = configurationRoot.GetSection("SendGrid:ApiKey");
         
         services.Configure<HomeAssistantOptions>(
             configurationRoot.GetSection(nameof(HomeAssistantOptions)));
@@ -63,6 +64,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IHomeAssistantProxy, HomeAssistantProxy>();
         services.AddSingleton<IDailyHourPriceRepository, DailyHourPriceRepository>();
         services.AddSingleton<IHeavyDutySwitchRepository, HeavyDutySwitchRepository>();
+        services.AddSingleton<IEmailService, EmailService>();
 
         services.AddQuartz(q =>
         {
@@ -78,6 +80,12 @@ IHost host = Host.CreateDefaultBuilder(args)
                 .WithDescription(
                     "This trigger will fetch data from the Nordpool sensor and add the hour prices for today and tomorrow to the database.")
             );
+            q.ScheduleJob<SendConsumptionReportJob>(trigger => trigger
+                .WithIdentity("SendConsumptionReport")
+                .WithCronSchedule("0 2 * * * ?", x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
+                .WithDescription(
+                    "This trigger will send a consumption report by SendGrid API")
+            );
         });
         services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
         services.AddTransient<WaterHeaterJob>();
@@ -87,4 +95,11 @@ IHost host = Host.CreateDefaultBuilder(args)
     .Build();
 
 IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
-await host.RunAsync();
+try
+{
+    await host.RunAsync();
+}
+catch (Exception e)
+{
+    Log.Error(e, "Homeassistant stopped due to error.");
+}

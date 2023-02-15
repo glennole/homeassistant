@@ -1,7 +1,5 @@
 using HomeAssistant.Contracts.Repositories;
-using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.Models;
-using Microsoft.Extensions.Options;
 using Quartz;
 using Serilog;
 
@@ -36,7 +34,7 @@ public class NordpoolSensorJob : IJob
                         Price = (decimal) _sensor.Attributes.Today[i]
                     };
 
-                    _dailyHourPriceRepository.AddAsync(dailyHourPrice);
+                    await _dailyHourPriceRepository.AddAsync(dailyHourPrice);
                 }
             }
 
