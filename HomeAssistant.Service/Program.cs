@@ -82,7 +82,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             );
             q.ScheduleJob<SendConsumptionReportJob>(trigger => trigger
                 .WithIdentity("SendConsumptionReport")
-                .WithCronSchedule("0 2 * * * ?", x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
+                .WithCronSchedule("0 2 2 * * ?", x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
                 .WithDescription(
                     "This trigger will send a consumption report by SendGrid API")
             );
