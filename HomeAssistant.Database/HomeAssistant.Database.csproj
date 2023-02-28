@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="Scripts\202302212326_function_getDailyConsumption.sql" />
       <None Remove="Scripts\202211152235_table_dailyhourprice.sql" />
       <EmbeddedResource Include="Scripts\202211152235_table_daily_hour_price.sql" />
       <None Remove="Scripts\202211152303_table_heavy_switch_state.sql" />

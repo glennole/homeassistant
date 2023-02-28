@@ -21,11 +21,24 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
         throw new NotImplementedException();
     }
 
+    public async Task<IDailyConsumption> GetDailyConsumptionByDate(DateTime date)
+    {
+        string yesterday = $"{date.Year}-{date.Month}-{date.Day}";
+        string sql = "SELECT * FROM getDailyConsumption(@Date)";
+        await using var con = new NpgsqlConnection(ConnectionString);
+        DailyConsumption? result = await con.QueryFirstAsync<DailyConsumption>(sql, new { Date = date});
+        if(result != null)
+        {
+            return result;
+        }
+        throw new ArgumentException("There are no readings from this date", "date");
+    }
+    
     public async Task<IHeavyDutySwitch> GetByIdAsync(int id)
     {
         string sql = "SELECT * FROM heavy_duty_switch WHERE id = @Id";
         await using var con = new NpgsqlConnection(ConnectionString);
-        return await con.QueryFirstAsync<HeavyDutySwitch>(sql, new { Id = id});
+        return await con.QueryFirstAsync<HeavyDutySwitch>(sql, new { Id = id}).ConfigureAwait(false);
     }
 
     public async Task<IHeavyDutySwitch> AddAsync(IHeavyDutySwitch item)

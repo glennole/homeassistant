@@ -13,13 +13,10 @@ public class EmailService : IEmailService
         _sendGridClient = new SendGridClient(apiKey);
     }
     
-    public async Task<bool> SendEmail()
+    public async Task<bool> SendEmail(string subject, string plainTextContent, string htmlContent)
     {
         var from = new EmailAddress("homeassistant@glennole.com", "HomeAssistant");
-        var subject = "Strømforbruk i går";
         var to = new EmailAddress("post@gohaugen.com", "Glenn Ole Haugen");
-        var plainTextContent = "Strømforbruk: 75kWh";
-        var htmlContent = "<string>Strømforbruk: 75kWh</strong>";
         var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
 
         var response = await _sendGridClient.SendEmailAsync(msg);

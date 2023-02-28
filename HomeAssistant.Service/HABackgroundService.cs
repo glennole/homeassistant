@@ -1,3 +1,4 @@
+using HomeAssistant.Contracts.Repositories;
 using HomeAssistant.Database;
 using HomeAssistant.Service.Configuration;
 using Microsoft.Extensions.Options;
@@ -17,15 +18,11 @@ public class VVSBackgroundService : BackgroundService
 
     public WaterHeater WaterHeater { get; }
 
-    public VVSBackgroundService(IHomeAssistantProxy homeAssistantProxy, IOptions<PostgresqlOptions> postgresqlConfig)
+    public VVSBackgroundService(IOptions<PostgresqlOptions> postgresqlConfig)
     {
         _switches = new List<Switch>();
         
         DatabaseWorker.Migrate(postgresqlConfig.Value.ConnectionString);
-        // _switches.Add(new Switch("switch.heavy_duty_switch", homeAssistantProxy, 5));
-        // NordpoolSensor = new Sensor<NordPoolAttributes>("sensor.nordpool_kwh_krsand_nok_3_095_025", homeAssistantProxy);
-        // ThresholdHandler = new ThresholdHandler(NordpoolSensor);
-        //
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
