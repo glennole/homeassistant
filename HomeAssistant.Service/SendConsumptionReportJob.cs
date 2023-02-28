@@ -1,3 +1,4 @@
+using HomeAssistant.Contracts.Repositories;
 using HomeAssistant.Service.SendGrid;
 using Quartz;
 using Serilog;
@@ -7,11 +8,13 @@ namespace HomeAssistant.Service;
 public class SendConsumptionReportJob  : IJob
 {
     private readonly IEmailService _emailService;
+    private readonly IHeavyDutySwitchRepository _heavyDutySwitchRepository;
     
-    public SendConsumptionReportJob(IEmailService emailService)
+    public SendConsumptionReportJob(IEmailService emailService, IHeavyDutySwitchRepository heavyDutySwitchRepository)
     {
         Log.Debug("Send consumption report job initiated");
         _emailService = emailService;
+        _heavyDutySwitchRepository = heavyDutySwitchRepository;
     }
     
     public async Task Execute(IJobExecutionContext context)
@@ -19,8 +22,18 @@ public class SendConsumptionReportJob  : IJob
         Log.Debug("Sending consumption report...");
         try
         {
-            await _emailService.SendEmail();
+            var dailyConsumption =
+                await _heavyDutySwitchRepository.GetDailyConsumptionByDate(DateTime.Today.AddDays(-1));
+            string contentPlain = $"Strømforbruk: {dailyConsumption.Consumption}. Kostnad: {dailyConsumption.Cost}";
+            string contentHtml =
+                $"<strong>Strømforbruk:</strong> {dailyConsumption.Consumption}. <strong>Kostnad:</strong> {dailyConsumption.Cost}.";
+            await _emailService.SendEmail($"Rapport for VVB {dailyConsumption.CalculationDate}", contentPlain,
+                contentHtml);
             Log.Debug("Consumption report sent successfully.");
+        }
+        catch (ArgumentException ae)
+        {
+            Log.Warning(ae.Message);
         }
         catch (Exception e)
         {
