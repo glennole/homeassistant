@@ -4,7 +4,13 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development",
+        "Vault__Address": "",
+        "Vault__MountPath": "",
+        "Vault__Secret": "",
+        "VAULT_TOKEN": "",
+        "Auth0__Audience": "",
+        "Auth0__Domain": ""
       }
     }
   }

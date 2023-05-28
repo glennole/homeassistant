@@ -40,6 +40,8 @@ public class VaultConfigurationProvider : ConfigurationProvider
         Data.Add("Jobs:WaterHeater:CronExp", homeAssistantSecret.Data["Jobs:WaterHeater:CronExp"].ToString());
         Data.Add("Jobs:Nordpool:CronExp", homeAssistantSecret.Data["Jobs:Nordpool:CronExp"].ToString());
         Data.Add("SendGrid:ApiKey", homeAssistantSecret.Data["SendGrid:ApiKey"].ToString());
+        Data.Add("Auth0:Audience", homeAssistantSecret.Data["Auth0:Audience"].ToString());
+        Data.Add("Auth0:Domain", homeAssistantSecret.Data["Auth0:Domain"].ToString());
     }
 }
 
