@@ -9,13 +9,8 @@ namespace HomeAssistant.Tests;
 
 public class HomeAssistantProxy_Tests
 {
-    private readonly IHomeAssistantProxy _homeAssistantProxy;
+    private readonly IHomeAssistantProxy _homeAssistantProxy = new HomeAssistantProxyMocked();
 
-    public HomeAssistantProxy_Tests()
-    {
-        _homeAssistantProxy = new HomeAssistantProxyMocked();
-    }
-    
     [Fact]
     public void GetStatesFromHomeAssistant_ReturnsListOfEntityStates()
     {

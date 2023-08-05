@@ -4,6 +4,7 @@ using HomeAssistant.Database;
 using HomeAssistant.PostgreSql.Repositories;
 using HomeAssistant.Service;
 using HomeAssistant.Service.Configuration;
+using HomeAssistant.Service.HvaKosterStrommen;
 using HomeAssistant.Service.SendGrid;
 using HomeAssistant.Service.Services;
 using HomeAssistant.Service.Vault;
@@ -71,6 +72,8 @@ builder.Host.ConfigureServices((context, services) =>
     services.AddSingleton<IHeavyDutySwitchRepository, HeavyDutySwitchRepository>();
     services.AddSingleton<IEmailService, EmailService>();
     services.AddSingleton<IWaterHeaterService, WaterHeaterService>();
+    services.AddSingleton<IHvaKosterStrommenHourPriceService, HvaKosterStrommenHourPriceService>();
+    services.AddSingleton<IDailyHourPriceService, DailyHourPriceService>();
 
     services.AddEndpointsApiExplorer();
     
@@ -163,6 +166,9 @@ app.UseAuthorization();
 
 app.RegisterWaterHeaterAPIs();
 app.MapGet("/spotprices/{date}", (DateTime date, IDailyHourPriceRepository priceRepository) => priceRepository.HasPricesForGivenDate(date))
+    .RequireAuthorization();
+app.MapPost("/spotprices/sync",
+        (IDailyHourPriceService dailyHourPriceService) => dailyHourPriceService.FetchAndStoreMissingDailyHourPrices())
     .RequireAuthorization();
 
 IConfiguration config = app.Services.GetRequiredService<IConfiguration>();

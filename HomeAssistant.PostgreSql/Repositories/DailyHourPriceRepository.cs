@@ -53,4 +53,13 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
         var dailyHourPrices = await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
         return dailyHourPrices.Any();
     }
+
+    public async Task<DateTime> GetLastDailyHourDate()
+    {
+        string sql = "SELECT MAX(date) FROM daily_hour_price";
+
+        using var con = new NpgsqlConnection(ConnectionString);
+        return await con.QueryFirstAsync<DateTime>(sql);
+        
+    }
 }
