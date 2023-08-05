@@ -40,7 +40,7 @@ public class HvaKosterStrommenHourPriceService : IHvaKosterStrommenHourPriceServ
                 Date = hourPrices[i].time_start,
                 Description = $"[{i}, {i + 1}>",
                 Hour = i,
-                Price = hourPrices[i].NOK_per_kwh
+                Price = hourPrices[i].NOK_per_kWh
             });
         }
 
