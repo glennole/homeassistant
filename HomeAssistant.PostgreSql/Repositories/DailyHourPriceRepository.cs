@@ -13,7 +13,7 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
     
     public DailyHourPriceRepository(IConfiguration configuration)
     {
-        ConnectionString = configuration["PostgresqlOptions:ConnectionString"];
+        ConnectionString = configuration["Postgresql:ConnectionString"];
     }
     public Task<IEnumerable<IDailyHourPrice>> GetAsync()
     {

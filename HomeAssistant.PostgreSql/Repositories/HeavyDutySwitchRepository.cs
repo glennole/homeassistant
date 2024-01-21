@@ -13,7 +13,7 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
 
     public HeavyDutySwitchRepository(IConfiguration configuration)
     {
-        ConnectionString = configuration["PostgresqlOptions:ConnectionString"];    
+        ConnectionString = configuration["Postgresql:ConnectionString"];    
     }
     
     public Task<IEnumerable<IHeavyDutySwitch>> GetAsync()

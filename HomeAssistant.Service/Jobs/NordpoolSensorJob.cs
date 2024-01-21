@@ -3,7 +3,7 @@ using HomeAssistant.Service.Models;
 using Quartz;
 using Serilog;
 
-namespace HomeAssistant.Service;
+namespace HomeAssistant.Service.Jobs;
 
 public class NordpoolSensorJob : IJob
 {

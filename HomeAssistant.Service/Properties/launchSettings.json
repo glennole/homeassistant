@@ -5,12 +5,11 @@
       "dotnetRunMessages": true,
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
-        "Vault__Address": "",
-        "Vault__MountPath": "",
-        "Vault__Secret": "",
-        "VAULT_TOKEN": "",
-        "Auth0__Audience": "",
-        "Auth0__Domain": ""
+        "AzureKeyVault__CLIENTID": "",
+        "AzureKeyVault__TENANTID": "",
+        "AzureKeyVault__CLIENTSECRET": "",
+        "AzureKeyVault__KEYVAULTNAME": "",
+        "AzureKeyVault__SECRETNAME": ""
       }
     }
   }

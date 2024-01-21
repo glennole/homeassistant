@@ -5,7 +5,7 @@ using Quartz;
 using Serilog;
 using ILogger = Serilog.ILogger;
 
-namespace HomeAssistant.Service;
+namespace HomeAssistant.Service.Jobs;
 
 public class WaterHeaterJob : IJob
 {
