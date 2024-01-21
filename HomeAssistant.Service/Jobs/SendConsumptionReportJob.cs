@@ -3,7 +3,7 @@ using HomeAssistant.Service.SendGrid;
 using Quartz;
 using Serilog;
 
-namespace HomeAssistant.Service;
+namespace HomeAssistant.Service.Jobs;
 
 public class SendConsumptionReportJob  : IJob
 {

@@ -1,10 +1,10 @@
-using System.Collections.Specialized;
 using HomeAssistant.Contracts.Repositories;
 using HomeAssistant.Database;
 using HomeAssistant.PostgreSql.Repositories;
 using HomeAssistant.Service;
 using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.HvaKosterStrommen;
+using HomeAssistant.Service.Jobs;
 using HomeAssistant.Service.SendGrid;
 using HomeAssistant.Service.Services;
 using HomeAssistant.Service.Vault;
@@ -39,34 +39,41 @@ builder.Host.ConfigureAppConfiguration((hostingContext, configuration) =>
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
     configuration
         .AddJsonFile($"appsettings.{env}.json", true, true);
-    configuration.AddEnvironmentVariables(prefix: "VAULT_");
     configuration.AddEnvironmentVariables();
     var buildConfig = configuration.Build();
 
-    configuration.AddVault(options =>
+    AzureKeyVaultOptions azureKeyVaultOptions = new AzureKeyVaultOptions();
+    buildConfig.GetSection(AzureKeyVaultOptions.AzureKeyVault).Bind(azureKeyVaultOptions);
+
+    configuration.AddAzureKeyVault(options =>
     {
-        var vaultOptions = buildConfig.GetSection("Vault");
-        options.Address = vaultOptions["Address"];
-        options.MountPath = vaultOptions["MountPath"];
-        options.Secret = vaultOptions["Secret"];
-        options.Token = buildConfig.GetSection("TOKEN").Value;
+        options.ClientId = azureKeyVaultOptions.ClientId;
+        options.ClientSecret = azureKeyVaultOptions.ClientSecret;
+        options.SecretName = azureKeyVaultOptions.SecretName;
+        options.TenantId = azureKeyVaultOptions.TenantId;
+        options.KeyVaultName = azureKeyVaultOptions.KeyVaultName;
     });
 });
+
+
+
 builder.Host.ConfigureServices((context, services) =>
 {
     var configurationRoot = context.Configuration;
-    services.Configure<VaultOptions>(configurationRoot.GetSection("Vault"));
+    //services.Configure<VaultOptions>(configurationRoot.GetSection("Vault"));
 
     var waterHeaterCronExp = configurationRoot.GetSection("Jobs:WaterHeater:CronExp");
     var nordpoolCronExp = configurationRoot.GetSection("Jobs:Nordpool:CronExp");
     var sendGridApiKey = configurationRoot.GetSection("SendGrid:ApiKey");
 
     services.Configure<HomeAssistantOptions>(
-        configurationRoot.GetSection(nameof(HomeAssistantOptions)));
+        configurationRoot.GetSection(HomeAssistantOptions.HomeAssistant));
 
     services.Configure<PostgresqlOptions>(
-        configurationRoot.GetSection(nameof(PostgresqlOptions)));
-
+        configurationRoot.GetSection(PostgresqlOptions.Postgresql));
+    
+    DatabaseWorker.Migrate(configurationRoot.GetSection(PostgresqlOptions.Postgresql).Get<PostgresqlOptions>().ConnectionString);
+    
     services.AddSingleton<IHomeAssistantProxy, HomeAssistantProxy>();
     services.AddSingleton<IDailyHourPriceRepository, DailyHourPriceRepository>();
     services.AddSingleton<IHeavyDutySwitchRepository, HeavyDutySwitchRepository>();
@@ -149,7 +156,6 @@ builder.Host.ConfigureServices((context, services) =>
     services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
     services.AddTransient<WaterHeaterJob>();
     services.AddTransient<NordpoolSensorJob>();
-    services.AddHostedService<VVSBackgroundService>();
 });
 WebApplication app = builder.Build();
 
