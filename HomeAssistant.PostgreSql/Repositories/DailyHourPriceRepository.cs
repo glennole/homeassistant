@@ -70,6 +70,6 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
     {
         string sql = "SELECT * FROM daily_hour_price WHERE date = @Date::date";
         using var con = new NpgsqlConnection(ConnectionString);
-        return await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
+        return  await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
     }
 }

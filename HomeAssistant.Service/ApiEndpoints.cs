@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Quartz.Impl.Calendar;
 
 namespace HomeAssistant.Service;
 
@@ -32,6 +33,10 @@ public static class ApiEndpoints
         app.MapGet("/waterheater/saved/{date}", 
             [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
                 await waterHeaterService.GetSavedByDateAsync(date));
+        
+        app.MapGet("/waterheater/saved/{year}/{month}", 
+            [Authorize] async (int year, int month, IWaterHeaterService waterHeaterService) => 
+                await waterHeaterService.GetSavedByMonthAsync(year, month));
 
     }
 }

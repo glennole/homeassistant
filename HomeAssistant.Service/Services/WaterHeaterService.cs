@@ -12,6 +12,7 @@ public interface IWaterHeaterService
     Task<decimal> GetWaterHeaterCostByDateAsync(DateTime date);
     Task<decimal> GetWaterHeaterConsumptionByDateAsync(DateTime date);
     Task<decimal> GetSavedByDateAsync(DateTime date);
+    Task<decimal> GetSavedByMonthAsync(int year, int month);
 }
 
 public class WaterHeaterService : IWaterHeaterService
@@ -76,6 +77,24 @@ public class WaterHeaterService : IWaterHeaterService
 
         return calculationReadings.Sum(r => r.Cost) - todaysReadings.Sum(r => r.Cost);
     }
+
+    public async Task<decimal> GetSavedByMonthAsync(int year, int month)
+    {
+        if (year > DateTime.Now.Year || (DateTime.Now.Year == year && month >= DateTime.Now.Month))
+            throw new ArgumentException("Only months in the past is valid");
+        
+        DateTime date = new DateTime(year, month, 1, 0,0,0, DateTimeKind.Local);
+        decimal sumSaved = 0.0m;
+        
+        while(date.Month == month)
+        {
+            sumSaved += await GetSavedByDateAsync(date);
+            date = date.AddDays(1);
+        }
+        
+        return sumSaved;
+    }
+
 
     private async Task<IEnumerable<HourlyConsumptionWithPriceAndCost>> GetHourlyConsumptionAndPriceByDate(DateTime date)
     {
