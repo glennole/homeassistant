@@ -72,7 +72,7 @@ public class DailyHourPriceService_Tests
     [Fact]
     public async void GetMissingDatesOfDailyHourPrices_ShouldReturnOneDayMissing()
     {
-        var result = await _dailyHourPriceService.FetchAndStoreMissingDailyHourPrices();
+        var result = await _dailyHourPriceService.FetchAndStoreMissingDailyHourPricesAsync();
         
         Assert.True(result > 0);
     }

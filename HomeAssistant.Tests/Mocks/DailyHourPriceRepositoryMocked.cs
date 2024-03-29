@@ -49,4 +49,9 @@ public class DailyHourPriceRepositoryMocked : IDailyHourPriceRepository
     {
         return await Task.FromResult(_dailyHourPrices.OrderByDescending(dhp => dhp.Date).First().Date);
     }
+
+    public Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDate(DateTime date)
+    {
+        throw new NotImplementedException();
+    }
 }
