@@ -12,12 +12,26 @@ public static class ApiEndpoints
 {
     public static void RegisterWaterHeaterAPIs(this WebApplication app)
     {
-        app.MapGet("/waterheaters/{id}/state",
-            [Authorize] async (int id, IWaterHeaterService waterHeaterService) => await waterHeaterService.GetStateById(id));
+        app.MapGet("/waterheater/{id}/state",
+            [Authorize] async (int id, IWaterHeaterService waterHeaterService) => 
+                await waterHeaterService.GetStateByIdAsync(id));
 
 
         app.MapGet("/waterheater/{id}", 
-            [Authorize] async (int id, IWaterHeaterService waterHeaterService) => await waterHeaterService.GetById(id));
-       
+            [Authorize] async (int id, IWaterHeaterService waterHeaterService) => 
+                await waterHeaterService.GetByIdAsync(id));
+
+        app.MapGet("/waterheater/cost/{date}", 
+            [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
+                await waterHeaterService.GetWaterHeaterCostByDateAsync(date));
+        
+        app.MapGet("/waterheater/consumption/{date}", 
+            [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
+                await waterHeaterService.GetWaterHeaterConsumptionByDateAsync(date));
+        
+        app.MapGet("/waterheater/saved/{date}", 
+            [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
+                await waterHeaterService.GetSavedByDateAsync(date));
+
     }
 }

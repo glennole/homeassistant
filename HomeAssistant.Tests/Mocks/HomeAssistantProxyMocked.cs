@@ -60,7 +60,7 @@ public class HomeAssistantProxyMocked : IHomeAssistantProxy
                 Max = 5.89
             }
         };
-
+        
         sensor.Attributes.Average = sensor.Attributes.Today.Sum() / 24.0;
 
         var heavySwitch = new EntityState<Attributes>()
@@ -69,9 +69,16 @@ public class HomeAssistantProxyMocked : IHomeAssistantProxy
             EntityId = "switch.heavy_duty_switch", 
             LastChangedAt = DateTime.Now
         };
-
+        var heavySwitchConsumptionKwh = new EntityState<HeavyDutySwitchKwhAttributes>()
+        {
+            State = "2675.12",
+            EntityId = "sensor.heavy_duty_switch_electric_consumption_kwh",
+            LastChangedAt = DateTime.Now
+        };
+        
         var jsonString = JsonSerializer.Serialize(sensor);
         jsonString += ", " +(JsonSerializer.Serialize(heavySwitch));
+        jsonString += ", " +(JsonSerializer.Serialize(heavySwitchConsumptionKwh));
         jsonString = "[" + jsonString + "]";
         
         var result = JsonSerializer.Deserialize<IEnumerable<EntityState<T>>>(jsonString);

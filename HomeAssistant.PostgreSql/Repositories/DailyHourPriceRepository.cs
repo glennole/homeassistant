@@ -48,9 +48,7 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
 
     public async Task<bool> HasPricesForGivenDate(DateTime date)
     {
-        string sql = "SELECT * FROM daily_hour_price WHERE date = @Date::date";
-        using var con = new NpgsqlConnection(ConnectionString);
-        var dailyHourPrices = await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
+        var dailyHourPrices = await FetchDailyHourPricesByDate(date);
         return dailyHourPrices.Any();
     }
 
@@ -61,5 +59,17 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
         using var con = new NpgsqlConnection(ConnectionString);
         return await con.QueryFirstAsync<DateTime>(sql);
         
+    }
+
+    public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDate(DateTime date)
+    {
+        return await FetchDailyHourPricesByDate(date);
+    }
+
+    private async Task<IEnumerable<IDailyHourPrice>> FetchDailyHourPricesByDate(DateTime date)
+    {
+        string sql = "SELECT * FROM daily_hour_price WHERE date = @Date::date";
+        using var con = new NpgsqlConnection(ConnectionString);
+        return await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
     }
 }

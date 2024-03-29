@@ -61,7 +61,8 @@ builder.Host.ConfigureServices((context, services) =>
 {
     var configurationRoot = context.Configuration;
     //services.Configure<VaultOptions>(configurationRoot.GetSection("Vault"));
-
+    
+    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
     var waterHeaterCronExp = configurationRoot.GetSection("Jobs:WaterHeater:CronExp");
     var nordpoolCronExp = configurationRoot.GetSection("Jobs:Nordpool:CronExp");
     var sendGridApiKey = configurationRoot.GetSection("SendGrid:ApiKey");
@@ -173,8 +174,10 @@ app.UseAuthorization();
 app.RegisterWaterHeaterAPIs();
 app.MapGet("/spotprices/{date}", (DateTime date, IDailyHourPriceRepository priceRepository) => priceRepository.HasPricesForGivenDate(date))
     .RequireAuthorization();
+app.MapPost("/spotprices/{date}", (DateTime date, IDailyHourPriceService priceService) => priceService.FetchAndStoreDailyHourPricesByDateAsync(date))
+    .RequireAuthorization();
 app.MapPost("/spotprices/sync",
-        (IDailyHourPriceService dailyHourPriceService) => dailyHourPriceService.FetchAndStoreMissingDailyHourPrices())
+        (IDailyHourPriceService dailyHourPriceService) => dailyHourPriceService.FetchAndStoreMissingDailyHourPricesAsync())
     .RequireAuthorization();
 
 IConfiguration config = app.Services.GetRequiredService<IConfiguration>();

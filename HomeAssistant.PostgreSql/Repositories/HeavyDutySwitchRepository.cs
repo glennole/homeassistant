@@ -21,7 +21,7 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
         throw new NotImplementedException();
     }
 
-    public async Task<IDailyConsumption> GetDailyConsumptionByDate(DateTime date)
+    public async Task<IDailyConsumption> GetDailyConsumptionByDateAsync(DateTime date)
     {
         string yesterday = $"{date.Year}-{date.Month}-{date.Day}";
         string sql = "SELECT * FROM getDailyConsumption(@Date)";
@@ -33,7 +33,17 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
         }
         throw new ArgumentException("There are no readings from this date", "date");
     }
-    
+
+    public async Task<IEnumerable<IHeavyDutySwitch>> GetReadingsPerHourByDateAsync(DateTime date)
+    {
+        DateTime fromDate = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
+        DateTime toDate = new DateTime(date.Year, date.Month, date.Day, 1, 0, 0, DateTimeKind.Local).AddDays(1);
+        
+        string sql = "SELECT * FROM heavy_duty_switch WHERE created_at between @from and @to ORDER BY created_at ASC";
+        await using var con = new NpgsqlConnection(ConnectionString);
+        return await con.QueryAsync<HeavyDutySwitch>(sql, new { From = fromDate, To = toDate });
+    }
+
     public async Task<IHeavyDutySwitch> GetByIdAsync(int id)
     {
         string sql = "SELECT * FROM heavy_duty_switch WHERE id = @Id";
