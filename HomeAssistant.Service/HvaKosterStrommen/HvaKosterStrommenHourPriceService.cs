@@ -31,6 +31,9 @@ public class HvaKosterStrommenHourPriceService : IHvaKosterStrommenHourPriceServ
 
         List<HvaKosterStrommenHourPrice> hourPrices = JsonSerializer.Deserialize<List<HvaKosterStrommenHourPrice>>(responseJson);
 
+        if (hourPrices.Count() == 23)
+            hourPrices.Insert(2, hourPrices[1]);
+        
         List<DailyHourPrice> dailyHourPrices = new List<DailyHourPrice>();
 
         for (int i = 0; i < 24; i++)
