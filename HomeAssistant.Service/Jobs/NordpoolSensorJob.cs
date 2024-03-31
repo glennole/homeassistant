@@ -24,34 +24,61 @@ public class NordpoolSensorJob : IJob
         {
             if (!await _dailyHourPriceRepository.HasPricesForGivenDate(DateTime.Now))
             {
-                for (int i = 0; i < 24; i++)
-                {
+                int adjustement = 0;
+                for (int i = 0; i < 24 - adjustement; i++)
+                {   
                     var dailyHourPrice = new DailyHourPrice()
                     {
                         Date = DateTime.Now,
-                        Description = $"[{i}, {i + 1}>",
-                        Hour = i,
+                        Description = $"[{i + adjustement}, {i + adjustement + 1}>",
+                        Hour = i + adjustement,
                         Price = (decimal) _sensor.Attributes.Today[i]
                     };
-
                     await _dailyHourPriceRepository.AddAsync(dailyHourPrice);
+                    
+                    if (_sensor.Attributes.Today.Length == 23 && i == 1)
+                    {
+                        adjustement++;
+                        var daylightsavingtime = new DailyHourPrice()
+                        {
+                            Date = DateTime.Now,
+                            Description = $"[{i + adjustement}, {i + adjustement + 1}>",
+                            Hour = i + adjustement,
+                            Price = (decimal) _sensor.Attributes.Today[i + adjustement]
+                        };
+                        await _dailyHourPriceRepository.AddAsync(daylightsavingtime);
+                    }
                 }
             }
 
             if (!await _dailyHourPriceRepository.HasPricesForGivenDate(DateTime.Now.AddDays(1)) &&
                 _sensor.Attributes.Tomorrow.Any())
             {
-                for (int i = 0; i < 24; i++)
+                int adjustement = 0;
+                for (int i = 0; i < 24 - adjustement; i++)
                 {
                     var dailyHourPrice = new DailyHourPrice()
                     {
                         Date = DateTime.Now.AddDays(1),
-                        Description = $"[{i}, {i + 1}>",
-                        Hour = i,
+                        Description = $"[{i + adjustement}, {i + adjustement + 1}>",
+                        Hour = i + adjustement,
                         Price = (decimal) _sensor.Attributes.Tomorrow[i]
                     };
 
                     _dailyHourPriceRepository.AddAsync(dailyHourPrice);
+                    
+                    if (_sensor.Attributes.Today.Length == 23 && i == 1)
+                    {
+                        adjustement++;
+                        var daylightsavingtime = new DailyHourPrice()
+                        {
+                            Date = DateTime.Now,
+                            Description = $"[{i + adjustement}, {i + adjustement + 1}>",
+                            Hour = i + adjustement,
+                            Price = (decimal) _sensor.Attributes.Today[i]
+                        };
+                        await _dailyHourPriceRepository.AddAsync(daylightsavingtime);
+                    }
                 }
             }
         }

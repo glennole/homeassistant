@@ -63,7 +63,8 @@ public class DailyHourPriceService : IDailyHourPriceService
 
     public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDateAsync(DateTime date)
     {
-        return AdjustPricesAccordingToGovernmentSubsidies(await _dailyHourPriceRepository.GetDailyHourPricesByDate(date));
+        DateTime dateOslo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(date, "Europe/Oslo");
+        return AdjustPricesAccordingToGovernmentSubsidies(await _dailyHourPriceRepository.GetDailyHourPricesByDate(dateOslo));
     }
 
     public async Task<int> FetchAndStoreDailyHourPricesByDateAsync(DateTime date)

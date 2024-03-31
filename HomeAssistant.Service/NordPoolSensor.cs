@@ -106,21 +106,38 @@ public class NordpoolSensor : Sensor<NordPoolAttributes>
     
     public IEnumerable<int> GetBottomHours()
     {
+        double[] pricePerHour;
+        if (Attributes.Today.Length == 23)
+        {
+            pricePerHour = new double[23];
+            int j = 0;
+            for (int i = 0; i < 24; i++)
+            {
+                pricePerHour[i] = Attributes.Today[j];
+                if (i != 1)
+                    j++;
+            }
+        }
+        else
+        {
+            pricePerHour = Attributes.Today;
+        }
+        
         var bottomHours = new List<int>();
         for (var i = 0; i < 24; i++)
         {
             switch (i)
             {
                 case 0:
-                    if(Attributes.Today[0] < Attributes.Today[1])
+                    if(pricePerHour[0] < pricePerHour[1])
                         bottomHours.Add(0);
                     break;
                 case 23:
-                    if(Attributes.Today[23] < Attributes.Today[22])
+                    if(pricePerHour[23] < pricePerHour[22])
                         bottomHours.Add(23);
                     break;
                 case < 23 and > 0:
-                    if(Attributes.Today[i] < Attributes.Today[i-1] && Attributes.Today[i] < Attributes.Today[i+1])
+                    if(pricePerHour[i] < pricePerHour[i-1] && pricePerHour[i] < pricePerHour[i+1])
                         bottomHours.Add(i);
                     break;
             }
