@@ -23,16 +23,22 @@ public static class ApiEndpoints
                 await waterHeaterService.GetByIdAsync(id));
 
         app.MapGet("/waterheater/cost/{date}", 
-            [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
-                await waterHeaterService.GetWaterHeaterCostByDateAsync(date));
+            [Authorize] async (DateTimeOffset date, IWaterHeaterService waterHeaterService) =>
+            {
+                return await waterHeaterService.GetWaterHeaterCostByDateAsync(date.ToUniversalTime().DateTime);
+            });
         
         app.MapGet("/waterheater/consumption/{date}", 
-            [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
-                await waterHeaterService.GetWaterHeaterConsumptionByDateAsync(date));
+            [Authorize] async (DateTimeOffset date, IWaterHeaterService waterHeaterService) =>
+            {
+                return await waterHeaterService.GetWaterHeaterConsumptionByDateAsync(date.ToUniversalTime().DateTime);
+            });
         
         app.MapGet("/waterheater/saved/{date}", 
-            [Authorize] async (DateTime date, IWaterHeaterService waterHeaterService) => 
-                await waterHeaterService.GetSavedByDateAsync(date));
+            [Authorize] async (DateTimeOffset date, IWaterHeaterService waterHeaterService) =>
+            {
+                return await waterHeaterService.GetSavedByDateAsync(date.ToUniversalTime().DateTime);
+            });
         
         app.MapGet("/waterheater/saved/{year}/{month}", 
             [Authorize] async (int year, int month, IWaterHeaterService waterHeaterService) => 

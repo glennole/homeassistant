@@ -1,6 +1,8 @@
+using System.Data;
 using System.Runtime.Serialization.Formatters;
 using HomeAssistant.Contracts.DTOs;
 using HomeAssistant.Contracts.Repositories;
+using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.Models;
 
 namespace HomeAssistant.Service.Services;
@@ -19,8 +21,9 @@ public class WaterHeaterService : IWaterHeaterService
 {
     private readonly IHeavyDutySwitchRepository _heavyDutySwitchRepository;
     private readonly IDailyHourPriceService _dailyHourPriceService;
-    
-    public WaterHeaterService(IHeavyDutySwitchRepository heavyDutySwitchRepository, IDailyHourPriceService dailyHourPriceService)
+
+    public WaterHeaterService(IHeavyDutySwitchRepository heavyDutySwitchRepository,
+        IDailyHourPriceService dailyHourPriceService)
     {
         _heavyDutySwitchRepository = heavyDutySwitchRepository;
         _dailyHourPriceService = dailyHourPriceService;
@@ -30,6 +33,7 @@ public class WaterHeaterService : IWaterHeaterService
     {
         return await _heavyDutySwitchRepository.GetByIdAsync(id);
     }
+
     public async Task<State> GetStateByIdAsync(int id)
     {
         IHeavyDutySwitch heavyDutySwitch = await _heavyDutySwitchRepository.GetByIdAsync(id);
@@ -38,7 +42,7 @@ public class WaterHeaterService : IWaterHeaterService
             Enum.TryParse<State>(heavyDutySwitch.State, out state);
         return state;
     }
-    
+
     public async Task<decimal> GetWaterHeaterCostByDateAsync(DateTime date)
     {
         return (await GetHourlyConsumptionAndPriceByDate(date)).Sum(hc => hc.Cost);
@@ -61,7 +65,7 @@ public class WaterHeaterService : IWaterHeaterService
 
         var temp = todaysReadings.Where(tr => tr.Hour > 5).ToList();
         temp.AddRange(tomorrowsReadings.Where(tr => tr.Hour < 6));
-        
+
         var calculationReadings = new List<HourlyConsumptionWithPriceAndCost>();
         int counter = 6;
         foreach (var hourlyConsumptionWithPriceAndCost in temp)
@@ -82,43 +86,93 @@ public class WaterHeaterService : IWaterHeaterService
     {
         if (year > DateTime.Now.Year || (DateTime.Now.Year == year && month >= DateTime.Now.Month))
             throw new ArgumentException("Only months in the past is valid");
-        
-        DateTime date = new DateTime(year, month, 1, 0,0,0, DateTimeKind.Local);
+
+        DateTime date = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Local);
         decimal sumSaved = 0.0m;
-        
-        while(date.Month == month)
+
+        while (date.Month == month)
         {
             sumSaved += await GetSavedByDateAsync(date);
             date = date.AddDays(1);
         }
-        
+
         return sumSaved;
     }
 
 
     private async Task<IEnumerable<HourlyConsumptionWithPriceAndCost>> GetHourlyConsumptionAndPriceByDate(DateTime date)
     {
-        var waterReadingTask = _heavyDutySwitchRepository.GetReadingsPerHourByDateAsync(date);
+        var waterReadingTask = _heavyDutySwitchRepository.GetReadingsByDateAsync(date);
         var hourPricesTask = _dailyHourPriceService.GetDailyHourPricesByDateAsync(date);
+
         await Task.WhenAll(waterReadingTask, hourPricesTask);
-        
+
         List<IHeavyDutySwitch> waterHeaterReadings = waterReadingTask.Result.ToList();
         List<IDailyHourPrice> hourPrices = hourPricesTask.Result.OrderBy(hp => hp.Hour).ToList();
 
-        if (waterHeaterReadings.Count() < 24 || hourPrices.Count() < 24)
+
+        var previousReadingTask = _heavyDutySwitchRepository.GetPreviousReadingAsync(waterHeaterReadings.Any()
+            ? waterHeaterReadings.OrderBy(r => r.ReadingAt).First().ReadingAt
+            : date);
+        var nextReadingTask = _heavyDutySwitchRepository.GetNextReadingAsync(waterHeaterReadings.Any()
+            ? waterHeaterReadings.OrderByDescending(r => r.ReadingAt).First().ReadingAt
+            : date);
+
+        await Task.WhenAll(previousReadingTask, nextReadingTask);
+
+        IHeavyDutySwitch previousReading = previousReadingTask.Result;
+        IHeavyDutySwitch nextReading = nextReadingTask.Result;
+
+        if (hourPrices.Count() < 24)
         {
             //Log.Information();
             throw new ArgumentException("Unable to retrieve readings for given date");
         }
-        
+
         List<HourlyConsumptionWithPriceAndCost> hourlyConsumptions = new List<HourlyConsumptionWithPriceAndCost>();
-        for (int i = 0; i < waterHeaterReadings.Count() - 1; i++)
+
+        bool setAllToZero = !waterHeaterReadings.Any();
+
+        for (int i = 0; i < 24; i++)
         {
-            decimal consumption = waterHeaterReadings[i + 1].AccumulatedKwh - waterHeaterReadings[i].AccumulatedKwh;
-            HourlyConsumptionWithPriceAndCost hourlyConsumption =
-                new HourlyConsumptionWithPriceAndCost(i, consumption, hourPrices[i].Price);
-            
-            hourlyConsumptions.Add(hourlyConsumption);
+            if (setAllToZero)
+            {
+                hourlyConsumptions.Add(
+                    new HourlyConsumptionWithPriceAndCost(i, 0, hourPrices.First(h => h.Hour == i).Price));
+            }
+            else
+            {
+                if (!waterHeaterReadings.Any(r => r.ReadingAt >= date && r.ReadingAt < date.AddHours(1))
+                    ||
+                    (!waterHeaterReadings.Any(r => r.ReadingAt >= date.AddHours(1)) && nextReading == null))
+                {
+                    hourlyConsumptions.Add(
+                        new HourlyConsumptionWithPriceAndCost(i, 0, hourPrices.First(h => h.Hour == i).Price));
+                }
+                else if (waterHeaterReadings.Any(r => r.ReadingAt >= date.AddHours(1)))
+                {
+                    decimal consumption = waterHeaterReadings.Where(r => r.ReadingAt >= date.AddHours(1))
+                                              .OrderBy(r => r.ReadingAt).First().AccumulatedKwh -
+                                          waterHeaterReadings
+                                              .Where(r => r.ReadingAt >= date && r.ReadingAt < date.AddHours(1))
+                                              .OrderBy(r => r.ReadingAt)
+                                              .First().AccumulatedKwh;
+                    hourlyConsumptions.Add(
+                        new HourlyConsumptionWithPriceAndCost(i, consumption, hourPrices.First(h => h.Hour == i).Price));
+                }
+                else
+                {
+                    decimal consumption = nextReading.AccumulatedKwh -
+                                          waterHeaterReadings
+                                              .Where(r => r.ReadingAt >= date && r.ReadingAt < date.AddHours(1))
+                                              .OrderBy(r => r.ReadingAt)
+                                              .First().AccumulatedKwh;
+                    hourlyConsumptions.Add(
+                        new HourlyConsumptionWithPriceAndCost(i, consumption, hourPrices.First(h => h.Hour == i).Price));
+                }
+            }
+
+            date = date.AddHours(1);
         }
 
         return hourlyConsumptions;
