@@ -15,6 +15,11 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
     {
         ConnectionString = configuration["Postgresql:ConnectionString"];    
     }
+
+    public HeavyDutySwitchRepository(string connectionString)
+    {
+        ConnectionString = connectionString;
+    }
     
     public Task<IEnumerable<IHeavyDutySwitch>> GetAsync()
     {
@@ -25,7 +30,7 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
     {
         string sql = "SELECT * FROM getDailyConsumption(@Date)";
         await using var con = new NpgsqlConnection(ConnectionString);
-        DailyConsumption? result = await con.QueryFirstAsync<DailyConsumption>(sql, new { Date = date});
+        DailyConsumption? result = await con.QueryFirstOrDefaultAsync<DailyConsumption>(sql, new { Date = date});
         if(result != null)
         {
             return result;
