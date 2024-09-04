@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using HomeAssistant.Contracts.DTOs;
 using HomeAssistant.Contracts.Repositories;
+using HomeAssistant.PostgreSql.DTOs;
 
 namespace HomeAssistant.Tests;
 
 public class DailyHourPriceRepositoryMocked : IDailyHourPriceRepository
 {
-
     private readonly List<IDailyHourPrice> _dailyHourPrices = new List<IDailyHourPrice>();
-    
+
     public async Task<IEnumerable<IDailyHourPrice>> GetAsync()
     {
         return await Task.FromResult<IEnumerable<IDailyHourPrice>>(_dailyHourPrices);
@@ -50,8 +50,34 @@ public class DailyHourPriceRepositoryMocked : IDailyHourPriceRepository
         return await Task.FromResult(_dailyHourPrices.OrderByDescending(dhp => dhp.Date).First().Date);
     }
 
-    public Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDate(DateTime date)
+    public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDate(DateTime date)
     {
-        throw new NotImplementedException();
+        List<IDailyHourPrice> dailyHourPrices = new List<IDailyHourPrice>();
+        
+        List<decimal> pricesOnePeak = new List<decimal>()
+        {
+            0.256m, 0.258m, 0.265m, 0.400m, 0.450m, 0.384m,
+            0.376m, 0.360m, 0.350m, 0.340m, 0.335m, 0.334m,
+            0.333m, 0.300m, 0.289m, 0.280m, 0.274m, 0.270m,
+            0.268m, 0.267m, 0.267m, 0.264m, 0.260m, 0.258m
+        }; 
+        
+       for (int i = 0; i < pricesOnePeak.Count; i++)
+           dailyHourPrices.Add(CreateDailyHourPrice(date, i, pricesOnePeak[i]));
+       
+       return await Task.FromResult(dailyHourPrices);
+    }
+
+    private IDailyHourPrice CreateDailyHourPrice(DateTime date, int hour, decimal price)
+    {
+        return new DailyHourPrice()
+        {
+            Id = date.Day * 100 + hour,
+            CreatedAt = DateTime.Now,
+            Date = date,
+            Description = $"[{hour}, {hour + 1}>",
+            Hour = hour,
+            Price = price
+        };
     }
 }
