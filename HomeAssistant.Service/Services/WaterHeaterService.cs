@@ -15,6 +15,7 @@ public interface IWaterHeaterService
     Task<decimal> GetWaterHeaterConsumptionByDateAsync(DateTime date);
     Task<decimal> GetSavedByDateAsync(DateTime date);
     Task<decimal> GetSavedByMonthAsync(int year, int month);
+    Task<List<int>> GetOperatingHoursByDate(DateTime date);
 }
 
 public class WaterHeaterService : IWaterHeaterService
@@ -97,6 +98,13 @@ public class WaterHeaterService : IWaterHeaterService
         }
 
         return sumSaved;
+    }
+
+    public async Task<List<int>> GetOperatingHoursByDate(DateTime date)
+    {
+        IEnumerable<IDailyHourPrice> result = await _dailyHourPriceService.GetDailyHourPricesByDateAsync(date);
+
+        return result.OrderBy(t => t.Price).Take(5).Select(t => t.Hour).ToList();
     }
 
 
