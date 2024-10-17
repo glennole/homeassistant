@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices.ComTypes;
 using HomeAssistant.Contracts.DTOs;
 using HomeAssistant.Contracts.Repositories;
+using HomeAssistant.PostgreSql.DTOs;
 using HomeAssistant.Service.HvaKosterStrommen;
 
 namespace HomeAssistant.Service.Services;
@@ -100,8 +101,18 @@ public class DailyHourPriceService : IDailyHourPriceService
     {
         List<IDailyHourPrice> dailyHourPrices = (await GetDailyHourPricesByDateAsync(date)).ToList();
         List<IDailyHourPrice> operatingHours = new List<IDailyHourPrice>();
-        
-        operatingHours.AddRange(dailyHourPrices.Where(dhp => dhp.Price < AlwaysRunWhenPriceBelow));
+
+        // Adding daily hour prices in the morning when there are no valid operating hours returned from service
+        if (dailyHourPrices.Count == 0)
+        {
+            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 3, Price = 0});
+            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 4, Price = 0});
+            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 5, Price = 0});
+            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 6, Price = 0});
+            
+        }
+        //Always run heater in the morning
+        operatingHours.AddRange(dailyHourPrices.Where(dhp => dhp.Price < AlwaysRunWhenPriceBelow || dhp.Hour is > 3 and < 6));
         operatingHours.AddRange(GetPeriodsBelowAveragePrice(dailyHourPrices).Where(dhp => !operatingHours.Contains(dhp)).OrderBy(dhp => dhp.Price).Take(MinimumOperatingHours));
 
         if (dailyHourPrices.Count() < MinimumOperatingHours)

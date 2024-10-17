@@ -144,6 +144,6 @@ public class DailyHourPriceService_Tests
         List<IDailyHourPrice> dailyHourPriceRepository =
             (await _dailyHourPriceService.GetOptimalHeatingHoursByDate(DateTime.Now.AddDays(-2))).ToList();
         
-        Assert.True(dailyHourPriceRepository.Count == 5);
+        Assert.True(dailyHourPriceRepository.Count == 8);
     }
 }
