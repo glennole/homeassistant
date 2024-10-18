@@ -87,7 +87,7 @@ public class Switch
         return State;
     }
 
-    public static State MapEntityStateToStateEnum(string entityState)
+    private static State MapEntityStateToStateEnum(string entityState)
     {
         return entityState.ToLower() switch
         {

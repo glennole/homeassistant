@@ -142,7 +142,7 @@ public class DailyHourPriceService_Tests
     public async void GetMinimumOperationHours_ShouldReturnMinimumFiveHours()
     {
         List<IDailyHourPrice> dailyHourPriceRepository =
-            (await _dailyHourPriceService.GetOptimalHeatingHoursByDate(DateTime.Now.AddDays(-2))).ToList();
+            (await _dailyHourPriceService.GetOptimalHeatingHoursByDate(new DateTime(2024, 10, 18))).ToList();
         
         Assert.True(dailyHourPriceRepository.Count == 8);
     }
