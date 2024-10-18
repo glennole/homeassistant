@@ -50,11 +50,11 @@ public class WaterHeaterTests
     }
 
     [Fact]
-    public async Task DetermineOnOrOffAtFifttheenOClock_ShouldReturnTrue()
+    public void DetermineOnOrOffAtFifttheenOClock_ShouldReturnTrue()
     {
         List<IDailyHourPrice> operatingHours =
-            (await _dailyHourPriceService.GetOptimalHeatingHoursByDate(new DateTime(2024,10,18))).ToList();
-        decimal dailyAverageHourPrice = await _dailyHourPriceService.GetDailyAverageHourPrice(new DateTime(2024,10,18));
+            (_dailyHourPriceService.GetOptimalHeatingHoursByDate(new DateTime(2024,10,18))).Result.ToList();
+        decimal dailyAverageHourPrice = _dailyHourPriceService.GetDailyAverageHourPrice(new DateTime(2024,10,18)).Result;
         
         Assert.True(_waterHeater.OnWhenWithinOperatingHours(15, operatingHours, dailyAverageHourPrice) == State.On);
     }

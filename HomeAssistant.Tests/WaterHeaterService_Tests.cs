@@ -28,9 +28,9 @@ public class WaterHeaterServiceTests
     }
 
     [Fact]
-    public async Task GetOperationHoursForToday_ShouldReturnAtleast5Hours()
+    public void GetOperationHoursForToday_ShouldReturnAtleast5Hours()
     {
-        Assert.True((await _waterHeaterService.GetOperatingHoursByDate(new DateTime(2024,10,18))).Count >= 5);
+        Assert.True( _waterHeaterService.GetOperatingHoursByDate(new DateTime(2024,10,18)).Result.Count >= 5);
     }
     
    
