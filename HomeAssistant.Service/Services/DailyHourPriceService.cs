@@ -75,8 +75,17 @@ public class DailyHourPriceService : IDailyHourPriceService
     public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDateAsync(DateTime date)
     {
         DateTime dateOslo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(date, "Europe/Oslo");
-        return AdjustPricesAccordingToGovernmentSubsidies(
-            await _dailyHourPriceRepository.GetDailyHourPricesByDate(dateOslo));
+        List<IDailyHourPrice> dailyHourPrices =
+            (await _dailyHourPriceRepository.GetDailyHourPricesByDate(dateOslo)).ToList();
+
+        if (!dailyHourPrices.Any())
+        {
+            int result = await FetchAndStoreDailyHourPricesByDateAsync(date);
+            if(result == 24)
+                dailyHourPrices = (await _dailyHourPriceRepository.GetDailyHourPricesByDate(dateOslo)).ToList();
+        }
+
+        return AdjustPricesAccordingToGovernmentSubsidies(dailyHourPrices);
     }
 
     public async Task<int> FetchAndStoreDailyHourPricesByDateAsync(DateTime date)
@@ -105,21 +114,27 @@ public class DailyHourPriceService : IDailyHourPriceService
         // Adding daily hour prices in the morning when there are no valid operating hours returned from service
         if (dailyHourPrices.Count == 0)
         {
-            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 3, Price = 0});
-            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 4, Price = 0});
-            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 5, Price = 0});
-            dailyHourPrices.Add(new DailyHourPrice(){Date = date, Hour = 6, Price = 0});
-            
+            dailyHourPrices.Add(new DailyHourPrice() { Date = date, Hour = 2, Price = 0 });
+            dailyHourPrices.Add(new DailyHourPrice() { Date = date, Hour = 3, Price = 0 });
+            dailyHourPrices.Add(new DailyHourPrice() { Date = date, Hour = 4, Price = 0 });
+            dailyHourPrices.Add(new DailyHourPrice() { Date = date, Hour = 5, Price = 0 });
+            dailyHourPrices.Add(new DailyHourPrice() { Date = date, Hour = 6, Price = 0 });
         }
+
         //Always run heater in the morning
-        operatingHours.AddRange(dailyHourPrices.Where(dhp => dhp.Price < AlwaysRunWhenPriceBelow || dhp.Hour is > 3 and < 6));
-        operatingHours.AddRange(GetPeriodsBelowAveragePrice(dailyHourPrices).Where(dhp => !operatingHours.Contains(dhp)).OrderBy(dhp => dhp.Price).Take(MinimumOperatingHours));
+        operatingHours.AddRange(dailyHourPrices.Where(dhp =>
+            dhp.Price < AlwaysRunWhenPriceBelow || dhp.Hour is > 3 and < 6));
+        operatingHours.AddRange(GetPeriodsBelowAveragePrice(dailyHourPrices).Where(dhp => !operatingHours.Contains(dhp))
+            .OrderBy(dhp => dhp.Price).Take(MinimumOperatingHours));
 
         if (dailyHourPrices.Count() < MinimumOperatingHours)
         {
-            operatingHours.AddRange(GetPeriodsAboveAveragePrice(dailyHourPrices).Where(dhp => !operatingHours.Contains(dhp)).OrderBy(dhp => dhp.Price).Take(MinimumOperatingHours - dailyHourPrices.Count()));
+            operatingHours.AddRange(GetPeriodsAboveAveragePrice(dailyHourPrices)
+                .Where(dhp => !operatingHours.Contains(dhp)).OrderBy(dhp => dhp.Price)
+                .Take(MinimumOperatingHours - dailyHourPrices.Count()));
         }
-        return operatingHours;  
+
+        return operatingHours;
     }
 
     public async Task<decimal> GetDailyAverageHourPrice(DateTime date)
@@ -129,9 +144,9 @@ public class DailyHourPriceService : IDailyHourPriceService
 
     private List<IDailyHourPrice> GetPeriodsAboveAveragePrice(List<IDailyHourPrice> dailyHourPrices)
     {
-        if(!dailyHourPrices.Any())
+        if (!dailyHourPrices.Any())
             return dailyHourPrices;
-        
+
         decimal averagePrice = dailyHourPrices.Average(dhp => dhp.Price);
         return dailyHourPrices.Where(dhp => dhp.Price >= averagePrice).ToList();
     }
