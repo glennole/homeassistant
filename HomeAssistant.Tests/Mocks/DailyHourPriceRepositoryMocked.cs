@@ -12,6 +12,19 @@ public class DailyHourPriceRepositoryMocked : IDailyHourPriceRepository
 {
     private readonly List<IDailyHourPrice> _dailyHourPrices = new List<IDailyHourPrice>();
 
+    public DailyHourPriceRepositoryMocked()
+    {
+        List<decimal> october10th = new List<decimal>()
+        {
+            0.643m, 0.636m, 0.633m, 0.633m, 0.634m, 0.643m,
+            0.714m, 1.904m, 2.438m, 1.566m, 0.876m, 0.712m,
+            0.701m, 0.691m, 0.666m, 0.665m, 0.670m, 0.713m,
+            0.892m, 0.906m, 0.714m, 0.714m, 0.666m, 0.6m
+        };
+        for (int i = 0; i < october10th.Count; i++)
+            _dailyHourPrices.Add(CreateDailyHourPrice(new DateTime(2024,10,18), i, october10th[i]));
+    }
+    
     public async Task<IEnumerable<IDailyHourPrice>> GetAsync()
     {
         return await Task.FromResult<IEnumerable<IDailyHourPrice>>(_dailyHourPrices);
@@ -52,6 +65,7 @@ public class DailyHourPriceRepositoryMocked : IDailyHourPriceRepository
 
     public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDate(DateTime date)
     {
+        return _dailyHourPrices.Where(dhp => dhp.Date.Date == date.Date);
         List<IDailyHourPrice> dailyHourPrices = new List<IDailyHourPrice>();
         
         List<decimal> pricesOnePeak = new List<decimal>()

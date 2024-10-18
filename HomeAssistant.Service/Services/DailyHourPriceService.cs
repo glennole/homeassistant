@@ -129,6 +129,9 @@ public class DailyHourPriceService : IDailyHourPriceService
 
     private List<IDailyHourPrice> GetPeriodsAboveAveragePrice(List<IDailyHourPrice> dailyHourPrices)
     {
+        if(!dailyHourPrices.Any())
+            return dailyHourPrices;
+        
         decimal averagePrice = dailyHourPrices.Average(dhp => dhp.Price);
         return dailyHourPrices.Where(dhp => dhp.Price >= averagePrice).ToList();
     }
