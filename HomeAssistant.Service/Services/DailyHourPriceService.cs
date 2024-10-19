@@ -139,7 +139,8 @@ public class DailyHourPriceService : IDailyHourPriceService
 
     public async Task<decimal> GetDailyAverageHourPrice(DateTime date)
     {
-        return (await GetDailyHourPricesByDateAsync(date)).Average(dhp => dhp.Price);
+        List<IDailyHourPrice> dailyHourPrices = (await GetDailyHourPricesByDateAsync(date)).ToList();
+        return !dailyHourPrices.Any() ? 0 : dailyHourPrices.Average(dhp => dhp.Price);
     }
 
     private List<IDailyHourPrice> GetPeriodsAboveAveragePrice(List<IDailyHourPrice> dailyHourPrices)
