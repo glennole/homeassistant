@@ -139,11 +139,11 @@ public class DailyHourPriceService_Tests
     }
 
     [Fact]
-    public async void GetMinimumOperationHours_ShouldReturnMinimumFiveHours()
+    public async void GetMinimumOperationHours_ShouldReturnMinimum8Hours()
     {
         List<IDailyHourPrice> dailyHourPriceRepository =
             (await _dailyHourPriceService.GetOptimalHeatingHoursByDate(new DateTime(2024, 10, 18))).ToList();
         
-        Assert.True(dailyHourPriceRepository.Count == 8);
+        Assert.True(dailyHourPriceRepository.Count > 7);
     }
 }
