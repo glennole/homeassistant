@@ -22,7 +22,7 @@ public class WaterHeaterServiceTests
             new HeavyDutySwitchRepository(""), 
             new DailyHourPriceService(
                 new DailyHourPriceRepositoryMocked(), 
-                new HvaKosterStrommenHourPriceService()
+                new HvaKosterStrommenHourPriceService(null)
                 )
             );
     }

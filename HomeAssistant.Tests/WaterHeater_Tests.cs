@@ -26,7 +26,7 @@ public class WaterHeaterTests
         //_switch = new Switch("switch.heavy_duty_switch", homeAssistantProxy, 6);
         _sensor = new NordpoolSensor("sensor.nordpool_kwh_krsand_nok_3_095_025", homeAssistantProxy);
         _waterHeater = new WaterHeater("switch.heavy_duty_switch", homeAssistantProxy);
-        _dailyHourPriceService = new DailyHourPriceService(new DailyHourPriceRepositoryMocked(), new HvaKosterStrommenHourPriceService());
+        _dailyHourPriceService = new DailyHourPriceService(new DailyHourPriceRepositoryMocked(), new HvaKosterStrommenHourPriceService(null));
         _heavyDutySwitchRepository = new HeavyDutySwitchRepository("");
     }
 
