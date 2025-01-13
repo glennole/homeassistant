@@ -23,10 +23,11 @@ public class WaterHeaterTests
     public WaterHeaterTests()
     {
         IHomeAssistantProxy homeAssistantProxy = new HomeAssistantProxyMocked();
+        IHourRepository hourRepository = new HourRepositoryMocked();
         //_switch = new Switch("switch.heavy_duty_switch", homeAssistantProxy, 6);
         _sensor = new NordpoolSensor("sensor.nordpool_kwh_krsand_nok_3_095_025", homeAssistantProxy);
         _waterHeater = new WaterHeater("switch.heavy_duty_switch", homeAssistantProxy);
-        _dailyHourPriceService = new DailyHourPriceService(new DailyHourPriceRepositoryMocked(), new HvaKosterStrommenHourPriceService(null));
+        _dailyHourPriceService = new DailyHourPriceService(new DailyHourPriceRepositoryMocked(), new HvaKosterStrommenHourPriceService(null), hourRepository);
         _heavyDutySwitchRepository = new HeavyDutySwitchRepository("");
     }
 
@@ -45,8 +46,8 @@ public class WaterHeaterTests
     [Fact]
     public async Task GetConsumptionByDateWhenThereAreNoReadings_ShouldReturnAnArgumentException()
     {
-        Assert.ThrowsAsync<ArgumentException>(async () =>
-            await _heavyDutySwitchRepository.GetDailyConsumptionByDateAsync(new DateTime(2025, 6, 10)));
+        await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await _heavyDutySwitchRepository.GetDailyConsumptionByDateAsync(new DateTime(2024, 10, 18)));
     }
 
     [Fact]

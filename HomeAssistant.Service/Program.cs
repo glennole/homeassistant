@@ -170,7 +170,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.RegisterWaterHeaterAPIs();
 app.MapGet("/spotprices/{date}", (DateTime date, IDailyHourPriceRepository priceRepository) => priceRepository.HasPricesForGivenDate(date))
     .RequireAuthorization();

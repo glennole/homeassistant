@@ -2,6 +2,7 @@ using System.Runtime.InteropServices.ComTypes;
 using HomeAssistant.Contracts.DTOs;
 using HomeAssistant.Contracts.Repositories;
 using HomeAssistant.PostgreSql.DTOs;
+using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.HvaKosterStrommen;
 
 namespace HomeAssistant.Service.Services;
@@ -18,19 +19,23 @@ public interface IDailyHourPriceService
     Task<int> FetchAndStoreDailyHourPricesByDateAsync(DateTime date);
     Task<IEnumerable<IDailyHourPrice>> GetOptimalHeatingHoursByDate(DateTime date);
     Task<decimal> GetDailyAverageHourPrice(DateTime date);
+    Task<IEnumerable<IHour>> AddHoursByDateAsync(DateTime date);
 }
 
 public class DailyHourPriceService : IDailyHourPriceService
 {
     private readonly IDailyHourPriceRepository _dailyHourPriceRepository;
+    private readonly IHourRepository _hourRepository;
     private readonly IHvaKosterStrommenHourPriceService _hvaKosterStrommenHourPriceService;
     private const decimal AlwaysRunWhenPriceBelow = 0.20m;
     private const int MinimumOperatingHours = 6;
 
 
     public DailyHourPriceService(IDailyHourPriceRepository dailyHourPriceRepository,
-        IHvaKosterStrommenHourPriceService hvaKosterStrommenHourPriceService)
+        IHvaKosterStrommenHourPriceService hvaKosterStrommenHourPriceService,
+        IHourRepository hourRepository)
     {
+        _hourRepository = hourRepository;
         _dailyHourPriceRepository = dailyHourPriceRepository;
         _hvaKosterStrommenHourPriceService = hvaKosterStrommenHourPriceService;
     }
@@ -95,10 +100,15 @@ public class DailyHourPriceService : IDailyHourPriceService
         if (existingDailyHourPrices.Any())
             return 0;
 
+        IEnumerable<IHour> hours = await AddHoursByDateAsync(date);
+        
         int counter = 0;
         IEnumerable<IDailyHourPrice> dailyHourPrices = await GetDailyHourPricesFromHvaKosterStrommenByDate(date);
         foreach (IDailyHourPrice dailyHourPrice in dailyHourPrices)
         {
+            // add hourprice
+            Error
+                
             await _dailyHourPriceRepository.AddAsync(dailyHourPrice);
             counter++;
         }
@@ -141,6 +151,26 @@ public class DailyHourPriceService : IDailyHourPriceService
     {
         List<IDailyHourPrice> dailyHourPrices = (await GetDailyHourPricesByDateAsync(date)).ToList();
         return !dailyHourPrices.Any() ? 0 : dailyHourPrices.Average(dhp => dhp.Price);
+    }
+
+    public async Task<IEnumerable<IHour>> AddHoursByDateAsync(DateTime date)
+    {
+        List<IHour> hours = (await _hourRepository.GetHoursByDateAsync(date)).ToList();
+        if (hours.Count != 0)
+            return hours;
+        
+        DateTime hourStarAndEnd = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
+        for (int hour = 0; hour < 24; hour++)
+        {
+            await _hourRepository.AddHourAsync(
+                new Hour() { 
+                    Date = date,
+                    StartAt  = date.AddHours(hour), 
+                    EndAt = date.AddHours(hour + 1)
+                });
+        }
+        
+        return await _hourRepository.GetHoursByDateAsync(date);
     }
 
     private List<IDailyHourPrice> GetPeriodsAboveAveragePrice(List<IDailyHourPrice> dailyHourPrices)

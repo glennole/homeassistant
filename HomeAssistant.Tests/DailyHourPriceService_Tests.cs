@@ -19,8 +19,9 @@ public class DailyHourPriceService_Tests
     public DailyHourPriceService_Tests()
     {
         IDailyHourPriceRepository dailyHourPriceRepository = new DailyHourPriceRepositoryMocked();
+        IHourRepository hourRepository = new HourRepositoryMocked();
         _dailyHourPriceService =
-            new DailyHourPriceService(dailyHourPriceRepository, new HvaKosterStrommenHourPriceService(null));
+            new DailyHourPriceService(dailyHourPriceRepository, new HvaKosterStrommenHourPriceService(null), hourRepository);
         
         dailyHourPriceRepository.AddAsync(new DailyHourPrice()
             { Date = DateTime.Now.AddDays(-2), Hour = 0, Price = 0.89m, Description = "[0, 1>" });
