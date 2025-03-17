@@ -4,6 +4,7 @@ using HomeAssistant.Contracts.Repositories;
 using HomeAssistant.PostgreSql.DTOs;
 using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.HvaKosterStrommen;
+using Serilog;
 
 namespace HomeAssistant.Service.Services;
 
@@ -27,21 +28,24 @@ public class DailyHourPriceService : IDailyHourPriceService
     private readonly IDailyHourPriceRepository _dailyHourPriceRepository;
     private readonly IHourRepository _hourRepository;
     private readonly IHvaKosterStrommenHourPriceService _hvaKosterStrommenHourPriceService;
+    private readonly IHourPriceRepository _hourPriceRepository;
     private const decimal AlwaysRunWhenPriceBelow = 0.20m;
     private const int MinimumOperatingHours = 6;
 
 
     public DailyHourPriceService(IDailyHourPriceRepository dailyHourPriceRepository,
         IHvaKosterStrommenHourPriceService hvaKosterStrommenHourPriceService,
-        IHourRepository hourRepository)
+        IHourRepository hourRepository, IHourPriceRepository hourPriceRepository)
     {
         _hourRepository = hourRepository;
         _dailyHourPriceRepository = dailyHourPriceRepository;
         _hvaKosterStrommenHourPriceService = hvaKosterStrommenHourPriceService;
+        _hourPriceRepository = hourPriceRepository;
     }
 
     public async Task<int> FetchAndStoreMissingDailyHourPricesAsync()
     {
+        Log.Information("Fetch and store missing daily hour prices");
         DateTime lastDailyHourDate = await _dailyHourPriceRepository.GetLastDailyHourDate();
 
         if ((lastDailyHourDate.Date == DateTime.Now.Date && DateTime.Now.Hour < 13)
@@ -74,11 +78,13 @@ public class DailyHourPriceService : IDailyHourPriceService
             counter++;
         }
 
+        Log.Information($"{counter} daily hour price(s) added.");
         return counter;
     }
 
     public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDateAsync(DateTime date)
     {
+        Log.Information("Fetching daily hour prices");
         DateTime dateOslo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(date, "Europe/Oslo");
         List<IDailyHourPrice> dailyHourPrices =
             (await _dailyHourPriceRepository.GetDailyHourPricesByDate(dateOslo)).ToList();
@@ -100,16 +106,21 @@ public class DailyHourPriceService : IDailyHourPriceService
         if (existingDailyHourPrices.Any())
             return 0;
 
-        IEnumerable<IHour> hours = await AddHoursByDateAsync(date);
+        List<IHour> hours = (await AddHoursByDateAsync(date)).OrderBy(h => h.StartAt).ToList();
         
         int counter = 0;
         IEnumerable<IDailyHourPrice> dailyHourPrices = await GetDailyHourPricesFromHvaKosterStrommenByDate(date);
+        List<IHourPrice> hourPrices = new List<IHourPrice>();
         foreach (IDailyHourPrice dailyHourPrice in dailyHourPrices)
         {
-            // add hourprice
-            Error
-                
-            await _dailyHourPriceRepository.AddAsync(dailyHourPrice);
+            HourPrice hourPrice = new HourPrice()
+            {
+                HourId = hours[dailyHourPrice.Hour].Id,
+                Price = dailyHourPrice.Price
+            };
+            
+            await _hourPriceRepository.AddHourPriceAsync(hourPrice);
+            await _dailyHourPriceRepository.AddAsync(dailyHourPrice); //ToDo: Fjernes
             counter++;
         }
 
@@ -155,22 +166,34 @@ public class DailyHourPriceService : IDailyHourPriceService
 
     public async Task<IEnumerable<IHour>> AddHoursByDateAsync(DateTime date)
     {
-        List<IHour> hours = (await _hourRepository.GetHoursByDateAsync(date)).ToList();
-        if (hours.Count != 0)
-            return hours;
-        
-        DateTime hourStarAndEnd = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0);
-        for (int hour = 0; hour < 24; hour++)
+        try
         {
-            await _hourRepository.AddHourAsync(
-                new Hour() { 
-                    Date = date,
-                    StartAt  = date.AddHours(hour), 
-                    EndAt = date.AddHours(hour + 1)
-                });
-        }
+            List<IHour> hours = (await _hourRepository.GetHoursByDateAsync(date)).ToList();
+            if (hours.Count != 0)
+                return hours;
+            
+            Log.Information("Adding hours by date");
+            TimeZoneInfo timeZoneInfoOslo = TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo");
+            DateTime hoursStartUtcDt = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc).AddHours(-timeZoneInfoOslo.BaseUtcOffset.Hours);
+
+            for (int hour = 0; hour < 24; hour++)
+            {
+                await _hourRepository.AddHourAsync(
+                    new Hour() { 
+                        Date = date,
+                        StartAt  = hoursStartUtcDt.AddHours(hour), 
+                        EndAt = hoursStartUtcDt.AddHours(hour + 1),
+                    });
+            }
+            
+            return await _hourRepository.GetHoursByDateAsync(date);
         
-        return await _hourRepository.GetHoursByDateAsync(date);
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Error while adding hours");
+            throw;
+        }
     }
 
     private List<IDailyHourPrice> GetPeriodsAboveAveragePrice(List<IDailyHourPrice> dailyHourPrices)

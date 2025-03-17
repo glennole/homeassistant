@@ -77,6 +77,8 @@ builder.Host.ConfigureServices((context, services) =>
     
     services.AddSingleton<IHomeAssistantProxy, HomeAssistantProxy>();
     services.AddSingleton<IDailyHourPriceRepository, DailyHourPriceRepository>();
+    services.AddSingleton<IHourRepository, HourRepository>();
+    services.AddSingleton<IHourPriceRepository, HourPriceRepository>();
     services.AddSingleton<IHeavyDutySwitchRepository, HeavyDutySwitchRepository>();
     services.AddSingleton<IEmailService, EmailService>();
     services.AddSingleton<IWaterHeaterService, WaterHeaterService>();
@@ -140,13 +142,6 @@ builder.Host.ConfigureServices((context, services) =>
                 x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
             .WithDescription("This trigger will run every 15 seconds to turn on or off water heater.")
         );
-        q.ScheduleJob<NordpoolSensorJob>(trigger => trigger
-            .WithIdentity("GetTodayAndTomorrowsPrices")
-            .WithCronSchedule(nordpoolCronExp.Value,
-                x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
-            .WithDescription(
-                "This trigger will fetch data from the Nordpool sensor and add the hour prices for today and tomorrow to the database.")
-        );
         q.ScheduleJob<SendConsumptionReportJob>(trigger => trigger
             .WithIdentity("SendConsumptionReport")
             .WithCronSchedule("0 2 2 * * ?", x => x.InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Oslo")))
@@ -156,7 +151,6 @@ builder.Host.ConfigureServices((context, services) =>
     });
     services.AddQuartzHostedService(options => { options.WaitForJobsToComplete = true; });
     services.AddTransient<WaterHeaterJob>();
-    services.AddTransient<NordpoolSensorJob>();
 });
 WebApplication app = builder.Build();
 

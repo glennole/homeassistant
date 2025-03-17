@@ -24,10 +24,11 @@ public class WaterHeaterTests
     {
         IHomeAssistantProxy homeAssistantProxy = new HomeAssistantProxyMocked();
         IHourRepository hourRepository = new HourRepositoryMocked();
+        IHourPriceRepository hourPriceRepository = new HourPriceRepositoryMocked();
         //_switch = new Switch("switch.heavy_duty_switch", homeAssistantProxy, 6);
         _sensor = new NordpoolSensor("sensor.nordpool_kwh_krsand_nok_3_095_025", homeAssistantProxy);
         _waterHeater = new WaterHeater("switch.heavy_duty_switch", homeAssistantProxy);
-        _dailyHourPriceService = new DailyHourPriceService(new DailyHourPriceRepositoryMocked(), new HvaKosterStrommenHourPriceService(null), hourRepository);
+        _dailyHourPriceService = new DailyHourPriceService(new DailyHourPriceRepositoryMocked(), new HvaKosterStrommenHourPriceService(null), hourRepository, hourPriceRepository);
         _heavyDutySwitchRepository = new HeavyDutySwitchRepository("");
     }
 

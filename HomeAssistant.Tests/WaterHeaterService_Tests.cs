@@ -18,13 +18,15 @@ public class WaterHeaterServiceTests
     {
         IDailyHourPriceRepository dailyHourPriceRepository = new DailyHourPriceRepositoryMocked();
         IHourRepository hourRepository = new HourRepositoryMocked();
+        IHourPriceRepository hourPriceRepository = new HourPriceRepositoryMocked();
         
         _waterHeaterService = new WaterHeaterService(
             new HeavyDutySwitchRepository(""), 
             new DailyHourPriceService(
                 new DailyHourPriceRepositoryMocked(), 
                 new HvaKosterStrommenHourPriceService(null),
-                hourRepository
+                hourRepository,
+                hourPriceRepository
                 )
             );
     }
