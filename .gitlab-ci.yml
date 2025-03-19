@@ -16,11 +16,11 @@ build:
   script:
     - |
       echo "Logging to Quay Container Registry with CI credentials..."
-      docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" "$DOCKER_REGISTRY"
+      docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
       use_version
-      docker build -t $DOCKER_REGISTRY/glennole/homeassistant.service:$CI_APPLICATION_TAG -t $DOCKER_REGISTRY/glennole/homeassistant.service:latest .
-      docker push $DOCKER_REGISTRY/glennole/homeassistant.service:$CI_APPLICATION_TAG
-      docker push $DOCKER_REGISTRY/glennole/homeassistant.service:latest
+      docker build -t gohaugen/homeassistant.service:$CI_APPLICATION_TAG -t gohaugen/homeassistant.service:latest .
+      docker push gohaugen/homeassistant.service:$CI_APPLICATION_TAG
+      docker push gohaugen/homeassistant.service:latest
   only:
     - branches
 .auto_devops: &auto_devops |

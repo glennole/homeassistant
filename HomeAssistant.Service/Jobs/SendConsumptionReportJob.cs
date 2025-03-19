@@ -3,7 +3,7 @@ using HomeAssistant.Service.SendGrid;
 using Quartz;
 using Serilog;
 
-namespace HomeAssistant.Service;
+namespace HomeAssistant.Service.Jobs;
 
 public class SendConsumptionReportJob  : IJob
 {
@@ -23,7 +23,7 @@ public class SendConsumptionReportJob  : IJob
         try
         {
             var dailyConsumption =
-                await _heavyDutySwitchRepository.GetDailyConsumptionByDate(DateTime.Today.AddDays(-1));
+                await _heavyDutySwitchRepository.GetDailyConsumptionByDateAsync(DateTime.Today.AddDays(-1));
             string contentPlain = $"Strømforbruk: {dailyConsumption.Consumption}. Kostnad: {dailyConsumption.Cost}";
             string contentHtml =
                 $"<strong>Strømforbruk:</strong> {dailyConsumption.Consumption}. <strong>Kostnad:</strong> {dailyConsumption.Cost}.";

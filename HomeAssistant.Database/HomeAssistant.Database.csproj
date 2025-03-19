@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="dbup-postgresql" Version="4.6.3" />
-      <PackageReference Include="Serilog" Version="2.12.0" />
+      <PackageReference Include="dbup-postgresql" Version="5.0.40" />
+      <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -18,6 +18,15 @@
       <None Remove="Scripts\202211152303_table_heavy_switch_state.sql" />
       <None Remove="Scripts\202211162334_table_heavy_duty_switch.sql" />
       <EmbeddedResource Include="Scripts\202211162334_table_heavy_duty_switch.sql" />
+      <None Remove="Scripts\202501090034_table_waterheater_usage_overview.sql" />
+      <None Remove="Scripts\202501092307_table_waterheater_usage.sql" />
+      <EmbeddedResource Include="Scripts\202501092307_table_waterheater_usage.sql" />
+      <None Remove="Scripts\202501092303_table_waterheater.sql" />
+      <EmbeddedResource Include="Scripts\202501092303_table_waterheater.sql" />
+      <None Remove="Scripts\202501092304_table_hour.sql" />
+      <EmbeddedResource Include="Scripts\202501092304_table_hour.sql" />
+      <None Remove="Scripts\202501092305_table_hour_price.sql" />
+      <EmbeddedResource Include="Scripts\202501092305_table_hour_price.sql" />
     </ItemGroup>
 
 </Project>

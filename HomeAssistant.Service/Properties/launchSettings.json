@@ -4,7 +4,12 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development",
+        "AzureKeyVault__CLIENTID": "",
+        "AzureKeyVault__TENANTID": "",
+        "AzureKeyVault__CLIENTSECRET": "",
+        "AzureKeyVault__KEYVAULTNAME": "",
+        "AzureKeyVault__SECRETNAME": ""
       }
     }
   }

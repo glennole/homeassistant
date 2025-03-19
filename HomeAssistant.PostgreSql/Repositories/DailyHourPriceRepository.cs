@@ -13,7 +13,7 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
     
     public DailyHourPriceRepository(IConfiguration configuration)
     {
-        ConnectionString = configuration["PostgresqlOptions:ConnectionString"];
+        ConnectionString = configuration["Postgresql:ConnectionString"];
     }
     public Task<IEnumerable<IDailyHourPrice>> GetAsync()
     {
@@ -48,9 +48,28 @@ public class DailyHourPriceRepository : IDailyHourPriceRepository
 
     public async Task<bool> HasPricesForGivenDate(DateTime date)
     {
+        var dailyHourPrices = await FetchDailyHourPricesByDate(date);
+        return dailyHourPrices.Any();
+    }
+
+    public async Task<DateTime> GetLastDailyHourDate()
+    {
+        string sql = "SELECT MAX(date) FROM daily_hour_price";
+
+        using var con = new NpgsqlConnection(ConnectionString);
+        return await con.QueryFirstAsync<DateTime>(sql);
+        
+    }
+
+    public async Task<IEnumerable<IDailyHourPrice>> GetDailyHourPricesByDate(DateTime date)
+    {
+        return await FetchDailyHourPricesByDate(date);
+    }
+
+    private async Task<IEnumerable<IDailyHourPrice>> FetchDailyHourPricesByDate(DateTime date)
+    {
         string sql = "SELECT * FROM daily_hour_price WHERE date = @Date::date";
         using var con = new NpgsqlConnection(ConnectionString);
-        var dailyHourPrices = await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
-        return dailyHourPrices.Any();
+        return  await con.QueryAsync<DailyHourPrice>(sql, new { Date = date});
     }
 }

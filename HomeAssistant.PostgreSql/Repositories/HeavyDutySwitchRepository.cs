@@ -13,7 +13,12 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
 
     public HeavyDutySwitchRepository(IConfiguration configuration)
     {
-        ConnectionString = configuration["PostgresqlOptions:ConnectionString"];    
+        ConnectionString = configuration["Postgresql:ConnectionString"];    
+    }
+
+    public HeavyDutySwitchRepository(string connectionString)
+    {
+        ConnectionString = connectionString;
     }
     
     public Task<IEnumerable<IHeavyDutySwitch>> GetAsync()
@@ -21,19 +26,45 @@ public class HeavyDutySwitchRepository : IHeavyDutySwitchRepository
         throw new NotImplementedException();
     }
 
-    public async Task<IDailyConsumption> GetDailyConsumptionByDate(DateTime date)
+    public async Task<IDailyConsumption> GetDailyConsumptionByDateAsync(DateTime date)
     {
-        string yesterday = $"{date.Year}-{date.Month}-{date.Day}";
         string sql = "SELECT * FROM getDailyConsumption(@Date)";
         await using var con = new NpgsqlConnection(ConnectionString);
-        DailyConsumption? result = await con.QueryFirstAsync<DailyConsumption>(sql, new { Date = date});
+        DailyConsumption? result = await con.QueryFirstOrDefaultAsync<DailyConsumption>(sql, new { Date = date});
         if(result != null)
         {
             return result;
         }
         throw new ArgumentException("There are no readings from this date", "date");
     }
-    
+
+    public async Task<IEnumerable<IHeavyDutySwitch>> GetReadingsByDateAsync(DateTime date)
+    {
+        
+        DateTime fromDate = new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Local);
+        DateTime toDate = new DateTime(date.Year, date.Month, date.Day, 1, 0, 0, DateTimeKind.Local).AddDays(1);
+        
+        string sql = "SELECT * FROM heavy_duty_switch WHERE reading_at between @from and @to ORDER BY reading_at ASC";
+        await using var con = new NpgsqlConnection(ConnectionString);
+        return await con.QueryAsync<HeavyDutySwitch>(sql, new { From = fromDate, To = toDate });
+    }
+
+    public async Task<IHeavyDutySwitch> GetPreviousReadingAsync(DateTime date)
+    {
+        string sql = "SELECT * FROM heavy_duty_switch WHERE reading_at < @date ORDER BY reading_at DESC LIMIT 1";
+        await using var con = new NpgsqlConnection(ConnectionString);
+        List<HeavyDutySwitch> readings =  (await con.QueryAsync<HeavyDutySwitch>(sql, new { Date = date})).ToList();
+        return readings.Any() ? readings.First() : null;
+    }
+
+    public async Task<IHeavyDutySwitch> GetNextReadingAsync(DateTime date)
+    {
+        string sql = "SELECT * FROM heavy_duty_switch WHERE reading_at > @date ORDER BY reading_at ASC LIMIT 1";
+        await using var con = new NpgsqlConnection(ConnectionString);
+        List<HeavyDutySwitch> readings =  (await con.QueryAsync<HeavyDutySwitch>(sql, new { Date = date})).ToList();
+        return readings.Any() ? readings.First() : null;
+    }
+
     public async Task<IHeavyDutySwitch> GetByIdAsync(int id)
     {
         string sql = "SELECT * FROM heavy_duty_switch WHERE id = @Id";
