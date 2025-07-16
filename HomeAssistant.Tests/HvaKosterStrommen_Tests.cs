@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using HomeAssistant.Service.HvaKosterStrommen;
-using HomeAssistant.Service.SendGrid;
 using Xunit;
 
 namespace HomeAssistant.Tests;

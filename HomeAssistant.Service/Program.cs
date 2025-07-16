@@ -5,7 +5,6 @@ using HomeAssistant.Service;
 using HomeAssistant.Service.Configuration;
 using HomeAssistant.Service.HvaKosterStrommen;
 using HomeAssistant.Service.Jobs;
-using HomeAssistant.Service.SendGrid;
 using HomeAssistant.Service.Services;
 using HomeAssistant.Service.Vault;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

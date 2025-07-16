@@ -1,5 +1,5 @@
 using HomeAssistant.Contracts.Repositories;
-using HomeAssistant.Service.SendGrid;
+using HomeAssistant.Service.Services;
 using Quartz;
 using Serilog;
 

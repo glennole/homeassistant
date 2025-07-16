@@ -1,7 +1,7 @@
 using System.Text.Json;
 using HomeAssistant.Contracts.DTOs;
 using HomeAssistant.Service.Models;
-using HomeAssistant.Service.SendGrid;
+using HomeAssistant.Service.Services;
 using Serilog;
 
 namespace HomeAssistant.Service.HvaKosterStrommen;

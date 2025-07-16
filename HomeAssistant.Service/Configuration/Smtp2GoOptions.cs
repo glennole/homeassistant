@@ -1,8 +1,8 @@
 namespace HomeAssistant.Service.Configuration;
 
-public class SendGridOptions
+public class Smtp2GoOptions
 {
-    public const string SendGrid = "SendGrid";
+    public const string SendGrid = "Smtp2Go";
 
     public string ApiKey { get; set; }
 }
