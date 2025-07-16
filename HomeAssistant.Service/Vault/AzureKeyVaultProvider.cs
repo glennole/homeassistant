@@ -40,7 +40,7 @@ public class AzureKeyVaultProvider : ConfigurationProvider
         Data.Add("Postgresql:ConnectionString", configuration.Postgresql.ConnectionString);
         Data.Add("Jobs:WaterHeater:CronExp", configuration.Jobs.WaterHeater.CronExp);
         Data.Add("Jobs:Nordpool:CronExp", configuration.Jobs.Nordpool.CronExp);
-        Data.Add("SendGrid:ApiKey", configuration.SendGrid.ApiKey);
+        Data.Add("Smtp2Go:ApiKey", configuration.Smtp2Go.ApiKey);
         Data.Add("Auth0:Audience", configuration.Auth0.Audience);
         Data.Add("Auth0:Domain", configuration.Auth0.Domain);
     }

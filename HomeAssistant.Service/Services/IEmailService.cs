@@ -1,4 +1,4 @@
-namespace HomeAssistant.Service.SendGrid;
+namespace HomeAssistant.Service.Services;
 
 public interface IEmailService
 {
